@@ -9,11 +9,33 @@ Numerical constructors for spherically symmetric real scalar and Proca oscillato
 
 ## Scope
 
-The vector constructor is restricted to the strictly spherical zero-magnetic sector ($B^i=\frac{1}{2}\epsilon^{ijk}F_{jk}=0$),
+The vector constructor is restricted to the strictly spherical zero-magnetic sector,
 
 $$
 X_\mu dx^\mu = U(t,x)\,dt + W(t,x)\,dx .
 $$
+
+Here zero-magnetic means
+
+$$
+B^i=\frac{1}{2}\epsilon^{ijk}F_{jk}=0 .
+$$
+
+The tensor $\epsilon^{ijk}$ is the Levi-Civita tensor on the spatial slice, with
+
+$$
+\epsilon^{ijk}=\frac{[ijk]}{\sqrt{\gamma}},
+$$
+
+where $[ijk]$ is the Levi-Civita symbol and $\gamma=\det\gamma_{ij}$. In polar-areal coordinates,
+
+$$
+\gamma_{ij}dx^idx^j=A(t,x)\,dx^2+x^2d\Omega^2,
+\qquad
+\sqrt{\gamma}=\sqrt{A(t,x)}\,x^2\sin\theta .
+$$
+
+For the ansatz above, $F_{x\theta}=F_{\theta\phi}=F_{\phi x}=0$, so $B^i=0$ identically.
 
 It is not a generic 3D Proca solver. Note that in the nonrelativistic limit this branch reduces to the radial-vector SP equation, not to the scalar SP equation.
 
@@ -61,11 +83,13 @@ $$
 M(t,x)=\frac{x}{2}\left(1-\frac{1}{A(t,x)}\right),
 $$
 
-and the plotted zero-mode mass is
+The code also uses the enclosed-mass notation built from the zero Fourier mode of $A$,
 
 $$
-M(<x)=\frac{x}{2}\left(1-\frac{1}{A_0(x)}\right).
+M({<}x)=\frac{x}{2}\left(1-\frac{1}{A_0(x)}\right).
 $$
+
+This is the quantity stored as `M0` in the examples. It is not the Fourier zero mode of $M(t,x)$ itself, because $[1/A]_0\ne1/A_0$ in general.
 
 ## Spherical Poisson-Gauge Convention
 
@@ -320,7 +344,7 @@ V(y)=V_\infty-\lim_{\kappa\to0}
 \frac{C_0(y/\kappa)-A_0(y/\kappa)}{\kappa^2}.
 $$
 
-Equivalently, if $\mathcal V_\kappa(x)=\kappa^2V(\kappa x)$, the weak-field zero-mode metric profiles obey
+Equivalently, if $\mathcal V_\kappa(x)=\kappa^2V(\kappa x)$ and primes on $\mathcal V_\kappa$ denote $d/dx$, the weak-field zero-mode metric profiles obey
 
 $$
 A_0(x)=1+x\mathcal V_\kappa'(x)+O(\kappa^4),
@@ -331,7 +355,7 @@ C_0(x)=1+x\mathcal V_\kappa'(x)+\kappa^2V_\infty-\mathcal V_\kappa(x)+O(\kappa^4
 $$
 
 $$
-M(<x)=\frac{x^2}{2}\mathcal V_\kappa'(x)+O(\kappa^3).
+M({<}x)=\frac{x^2}{2}\mathcal V_\kappa'(x)+O(\kappa^3).
 $$
 
 With these definitions, the scalar SP ground state solves
@@ -426,7 +450,7 @@ Note that there is an extra $-2F/y^2$ term in the radial-vector equation.
 | `rho` | Scaled plotting radius. The scalar/vector/SP comparison uses $\rho=\kappa x$; the Poisson-gauge local-estimate comparison uses $\rho=\epsilon R$. |
 | `A0`, `C0` | Code arrays storing the zero Fourier modes of `A` and `C`. |
 | `A2`, `C2` | Code arrays storing the second Fourier modes of `A` and `C`. |
-| `M0` | Code array storing the zero-mode enclosed mass. |
+| `M0` | Code array storing $M({<}x)=x(1-1/A_0)/2$, the enclosed-mass function built from the zero Fourier mode of `A`. |
 | `phi1_center` | Scalar central amplitude used as the scalar BVP input. |
 | `u1_center` | Vector central amplitude used as the vector BVP input. |
 
