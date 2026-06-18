@@ -9,33 +9,13 @@ Numerical constructors for spherically symmetric real scalar and Proca oscillato
 
 ## Scope
 
-The vector constructor is restricted to the strictly spherical zero-magnetic sector,
+The vector constructor is restricted to the spherical sector,
 
 $$
 X_\mu dx^\mu = U(t,x)\,dt + W(t,x)\,dx .
 $$
 
-Here zero-magnetic means
-
-$$
-B^i=\frac{1}{2}\epsilon^{ijk}F_{jk}=0 .
-$$
-
-The tensor $\epsilon^{ijk}$ is the Levi-Civita tensor on the spatial slice, with
-
-$$
-\epsilon^{ijk}=\frac{[ijk]}{\sqrt{\gamma}},
-$$
-
-where $[ijk]$ is the Levi-Civita symbol and $\gamma=\det\gamma_{ij}$. In polar-areal coordinates,
-
-$$
-\gamma_{ij}dx^idx^j=A(t,x)\,dx^2+x^2d\Omega^2,
-\qquad
-\sqrt{\gamma}=\sqrt{A(t,x)}\,x^2\sin\theta .
-$$
-
-For the ansatz above, $F_{x\theta}=F_{\theta\phi}=F_{\phi x}=0$, so $B^i=0$ identically.
+> For this ansatz, $B^i=\frac{1}{2}\epsilon^{ijk}F_{jk}=0$. The tensor $\epsilon^{ijk}$ is the Levi-Civita tensor on the spatial slice, with $\epsilon^{ijk}=\frac{[ijk]}{\sqrt{\gamma}}$, where $[ijk]$ is the Levi-Civita symbol and $\gamma=\det\gamma_{ij}$. In polar-areal coordinates, $\gamma_{ij}dx^idx^j=A(t,x)\,dx^2+x^2d\Omega^2$, $\sqrt{\gamma}=\sqrt{A(t,x)}\,x^2\sin\theta$. For the ansatz above, $F_{x\theta}=F_{\theta\phi}=F_{\phi x}=0$, so $B^i=0$.
 
 It is not a generic 3D Proca solver. Note that in the nonrelativistic limit this branch reduces to the radial-vector SP equation, not to the scalar SP equation.
 
