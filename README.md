@@ -3,7 +3,7 @@
 Numerical constructors for spherically symmetric real scalar and Proca oscillatons in polar-areal gauge. The code also includes scalar SP and radial-vector SP reference profiles for weak-field comparisons.
 
 <p align="center">
-  <img src="figures/proca_g00_m6e-1.gif" alt="Time-dependent density plot of the Proca soliton g00 profile in the phi=0 plane" width="420" style="border-radius:50%;">
+  <img src="figures/proca_g00_m6e-1.gif" alt="Time-dependent density plot of the Proca oscillaton g00 profile in the phi=0 plane" width="420" style="border-radius:50%;">
 </p>
 <p align="center"><i>g</i><sub>00</sub>(t,x) of a spherical Proca oscillaton, with parameters: <code>mu=1, G=1, mu*M_ADM=0.600014874, omega=0.978575355, epsilon=0.205888987, jmax=6</code></p>
 
@@ -121,19 +121,20 @@ $$
 \Phi_2^{\mathrm{num}}=-\frac{1}{2}[\chi-1]_{2\omega}.
 $$
 
-The transformed scalar fundamental mode is
+The transformed scalar fundamental mode is the cosine coefficient at frequency $\omega$,
 
 $$
-\phi_{1,\mathrm{PG}}(R)=2\langle\Phi_{\mathrm{code}}(t(\tau,R),x(\tau,R))\cos(\omega\tau)\rangle_\tau .
+\phi_{1,\mathrm{PG}}(R)=\frac{\omega}{\pi}\int_{\tau_0}^{\tau_0+2\pi/\omega}
+\Phi_{\mathrm{code}}(t(\tau,R),x(\tau,R))\cos(\omega\tau)\,d\tau .
 $$
 
 With $\Phi_{\mathrm{code}}=\sqrt{8\pi G}\,\varphi_{\mathrm{phys}}$, the local real-scalar estimate gives
 
 $$
-\phi_{1,\mathrm{PG}}^2=16\pi G\frac{\rho}{\mu^2},
+\phi_{1,\mathrm{PG}}^2=16\pi G\frac{\varrho_{\mathrm{loc}}}{\mu^2},
 $$
 
-and therefore
+where $\varrho_{\mathrm{loc}}$ is the local physical energy density entering the weak-field estimate, not the scaled plotting radius `rho`. Therefore
 
 $$
 -\Psi_2^{\mathrm{local}}=\Phi_2^{\mathrm{local}}=\frac{\phi_{1,\mathrm{PG}}^2}{16}.
@@ -220,6 +221,78 @@ U'&=-\partial_t\!\left(\sqrt{C}\,\dot E\right)-\frac{AE}{\sqrt{C}},\\
 $$
 
 The vector central input parameter in the API is `u1_center`, the value of the first vector Fourier coefficient at the origin.
+
+## Boundary Conditions
+
+The Fourier BVP is solved on a finite interval $x_{\min}\le x\le x_{\max}$. The solvers use `x_min=1.0e-4`, while `x_max` is user-controlled. The frequency `omega` is solved as an eigenvalue. The retained matter modes are odd and the retained metric modes are even:
+
+$$
+\mathcal J_{\mathrm{m}}=\{j\in\mathbb N:\ j\ \mathrm{odd},\ 1\le j\le j_{\max}\},
+\qquad
+\mathcal J_{\mathrm{g}}=\{j\in\mathbb N_0:\ j\ \mathrm{even},\ 0\le j\le j_{\max}\}.
+$$
+
+For the scalar constructor, let $\phi_{1,c}$ denote the input `phi1_center`. The inner boundary conditions are
+
+$$
+\begin{aligned}
+\phi_1(x_{\min})&=\phi_{1,c},\\
+\phi_j'(x_{\min})&=0\qquad (j\in\mathcal J_{\mathrm{m}}),\\
+A_0(x_{\min})&=1.
+\end{aligned}
+$$
+
+The scalar outer boundary conditions are
+
+$$
+\begin{aligned}
+\phi_j(x_{\max})&=0\qquad (j\in\mathcal J_{\mathrm{m}}),\\
+C_0(x_{\max})&=A_0(x_{\max})^2,\\
+C_j(x_{\max})&=0\qquad (j\in\mathcal J_{\mathrm{g}},\ j\ge2).
+\end{aligned}
+$$
+
+For the Proca constructor, let $u_{1,c}$ denote the input `u1_center`. The inner boundary conditions are
+
+$$
+\begin{aligned}
+u_1(x_{\min})&=u_{1,c},\\
+A_0(x_{\min})&=1,\\
+e_j(x_{\min})&=-\frac{x_{\min}}{3}\,[\sqrt{C}\,U]_j(x_{\min})\qquad (j\in\mathcal J_{\mathrm{m}}).
+\end{aligned}
+$$
+
+Here $[\sqrt{C}\,U]_j$ is the cosine Fourier coefficient of $\sqrt{C(t,x_{\min})}\,U(t,x_{\min})$ at odd matter mode $j$. This is the regular-origin Gauss-law condition for the radial electric coefficients.
+
+The Proca outer matter condition is applied mode by mode for $j\in\mathcal J_{\mathrm{m}}$. For $j\omega<1$, define
+
+$$
+\gamma_j=\sqrt{1-j^2\omega^2}.
+$$
+
+The outer matter condition is
+
+$$
+\begin{cases}
+\gamma_j^2 e_j(x_{\max})-\left(\gamma_j+\dfrac{1}{x_{\max}}\right)u_j(x_{\max})=0, & j\omega<1,\\
+u_j(x_{\max})=0, & j\omega\ge1.
+\end{cases}
+$$
+
+The first line is the finite-radius Yukawa Robin condition obtained from $u_j\propto e^{-\gamma_j x}/x$ and the asymptotic linear Proca relation $u_j'=-\gamma_j^2 e_j$. The second line is the finite-domain closure used by this code when the retained mode does not have a Yukawa decay constant. The code does not impose an outgoing-wave condition.
+
+The Proca metric outer boundary conditions are the same as in the scalar constructor,
+
+$$
+\begin{aligned}
+C_0(x_{\max})&=A_0(x_{\max})^2,\\
+C_j(x_{\max})&=0\qquad (j\in\mathcal J_{\mathrm{g}},\ j\ge2).
+\end{aligned}
+$$
+
+The inner conditions enforce regularity at the origin in polar-areal variables. The metric outer conditions set the oscillating metric modes to zero at the boundary and use $C_0=A_0^2$ as the finite-radius Schwarzschild/asymptotic time-normalization condition. The matter outer conditions are finite-domain closure conditions for the Fourier BVP; they are not time-evolution radiation boundary conditions.
+
+Basic numerical checks are: `profile.metadata["success"]` should be true, `profile.metadata["max_rms_residual"]` should be comparable to the requested `tol`, the outer tail of `profile.mass_profile` should be nearly flat, and the plotted profiles should be stable when `x_max`, `n_grid`, and the Fourier truncation are increased. The comparison example prints `scalar_tail_rel_std` and `proca_tail_rel_std`, which are the relative standard deviations of the outer mass tail.
 
 ## Nonrelativistic References
 
@@ -350,7 +423,7 @@ Note that there is an extra $-2F/y^2$ term in the radial-vector equation.
 | `tol` | Boundary-value solver tolerance. |
 | `mass_tol` | Relative tolerance used by the mass-tuning wrapper. |
 | `x_max` | Outer radial boundary in dimensionless radius $x$. |
-| `rho` | Scaled plotting radius; mathematically $\rho=\kappa x$. |
+| `rho` | Scaled plotting radius. The scalar/vector/SP comparison uses $\rho=\kappa x$; the Poisson-gauge local-estimate comparison uses $\rho=\epsilon R$. |
 | `A0`, `C0` | Code arrays storing the zero Fourier modes of `A` and `C`. |
 | `A2`, `C2` | Code arrays storing the second Fourier modes of `A` and `C`. |
 | `M0` | Code array storing the zero-mode enclosed mass. |
@@ -433,7 +506,3 @@ python examples/compare_scalar_local_estimate.py \
 ```
 
 This example first transforms the scalar oscillaton to the spherical Poisson-like gauge described above, then plots $-\Psi_2^{\mathrm{num}}$ and $\Phi_2^{\mathrm{num}}$ against the local estimate $\phi_{1,\mathrm{PG}}^2/16$.
-
-## Limitations
-
-The full scalar and vector oscillatons are Fourier-truncated real-field solutions on a finite radial domain. In the asymptotic massive-field equation, a Fourier component with frequency $\Omega_j=j\omega$ is exponentially localized only when $\Omega_j<\mu$; for $\Omega_j\ge\mu$ the linear tail is oscillatory rather than Yukawa-decaying. Since this code uses $\mu=1$, high harmonics with $j\omega\ge 1$ should be interpreted as finite-domain radiative/truncation tails, not as strictly bound matter modes.
