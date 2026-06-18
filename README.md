@@ -1,6 +1,6 @@
-# Spherical Soliton & Oscillaton Builder
+# Spherical Soliton & Oscillaton Constructor
 
-Numerical constructors for real scalar oscillatons and strictly spherical real Proca, or vector, oscillatons in polar-areal gauge. The code also includes scalar SP and radial-vector SP reference profiles for weak-field comparisons.
+Numerical constructors for spherically symmetric real scalar and Proca oscillatons in polar-areal gauge. The code also includes scalar SP and radial-vector SP reference profiles for weak-field comparisons.
 
 <p align="center">
   <img src="figures/proca_g00_m6e-1.gif" alt="Time-dependent density plot of the Proca soliton g00 profile in the phi=0 plane" width="420" style="border-radius:50%;">
