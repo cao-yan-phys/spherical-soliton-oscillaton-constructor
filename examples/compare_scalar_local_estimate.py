@@ -249,7 +249,7 @@ def main() -> None:
         label=r"$\phi_{1,\mathrm{PG}}^2/16$",
     )
     axes[0].set_yscale("log")
-    axes[0].set_xlabel(r"$\rho=\epsilon R$")
+    axes[0].set_xlabel(r"$\tilde{\rho}=\epsilon R$")
     axes[0].set_ylabel(r"$-\Psi_2$")
     axes[0].grid(True, alpha=0.25)
     axes[0].legend(fontsize=10)
@@ -270,7 +270,7 @@ def main() -> None:
         label=r"$\phi_{1,\mathrm{PG}}^2/16$",
     )
     axes[1].set_yscale("log")
-    axes[1].set_xlabel(r"$\rho=\epsilon R$")
+    axes[1].set_xlabel(r"$\tilde{\rho}=\epsilon R$")
     axes[1].set_ylabel(r"$\Phi_2$")
     axes[1].grid(True, alpha=0.25)
     axes[1].legend(fontsize=10)
