@@ -82,7 +82,7 @@ $$
 For a spherical solution, the corresponding non-perturbative construction is an isotropic, Poisson-like gauge. Starting from
 
 $$
-ds^2=-\frac{A}{C}dt^2+A\,dx^2+x^2d\Omega^2,
+ds^2=-\frac{A}{C}dt^2+A\,dx^2+x^2d\Omega^2,\quad d\Omega^2=d\theta^2+\sin^2\theta\,d\phi^2,
 $$
 
 define
@@ -94,10 +94,10 @@ $$
 and impose
 
 $$
-g_{\tau R}=0,\qquad g_{RR}=\frac{g_{\theta\theta}}{R^2}\equiv \chi(\tau,R).
+g_{\tau R}=0,\qquad g_{RR}=\frac{g_{\theta\theta}}{R^2}\equiv \chi(\tau,R),
 $$
 
-These are exact spherical conditions. They become the usual Cartesian Poisson gauge only after expanding around flat space, where
+such that $ds^2=-g_{\tau\tau}d\tau^2+g_{RR}[dR^2+R^2(d\theta^2+\sin^2\theta\,d\phi^2)]$. These are exact defining conditions. They become the usual Cartesian Poisson gauge only after expanding around flat space, where
 
 $$
 g_{\tau\tau}^{\mathrm{PG}}=-(1+2\Psi+\cdots),\qquad \chi=1-2\Phi_{\mathrm{metric}}+\cdots .
@@ -132,27 +132,77 @@ $$
 > \widehat{\Phi}(t(\tau,R),x(\tau,R))\cos(\omega\tau)\,d\tau .
 > $$
 >
-> The *local* real-scalar estimate gives
+> #### Local estimate in the scalar case
+>
+> At fixed $R$, the local estimate neglects spatial gradients over one Compton period and keeps only the leading real-scalar oscillator,
+> $$
+> \widehat{\Phi}(\tau,R)=\sqrt{8\pi}\,\Phi(\tau,R)\simeq \phi_{1,\mathrm{PG}}(R)\cos(\omega\tau).
+> $$
+>
+> Here $\tau$ is the dimensionless Poisson-gauge time, $\Phi$ is the physical Klein-Gordon field, and $\partial_\tau\Phi$ is the derivative with respect to $\tau$. In the nonrelativistic limit $\omega=1+O(\epsilon^2)$, the local density and pressure are
 >
 > $$
-> \phi_{1,\mathrm{PG}}^2=16\pi\frac{\varrho_{\mathrm{loc}}}{\mu^2},
+> \varrho_{\mathrm{loc}}=\frac{\mu^2}{2}\left\langle(\partial_\tau\Phi)^2+\Phi^2\right\rangle_\tau=\frac{\mu^2\phi_{1,\mathrm{PG}}^2}{16\pi}+O(\epsilon^2\mu^2\phi_{1,\mathrm{PG}}^2),
 > $$
 >
-> where $\varrho_{\mathrm{loc}}$ is the local physical energy density entering the weak-field estimate, not the scaled plotting radius `rho`. Therefore
+> $$
+> p_{\mathrm{loc}}(\tau,R)=p_{2,\mathrm{loc}}(R)\cos(2\omega\tau)+\cdots,\qquad p_{2,\mathrm{loc}}=-\frac{\mu^2\phi_{1,\mathrm{PG}}^2}{16\pi}+O(\epsilon^2\mu^2\phi_{1,\mathrm{PG}}^2).
+> $$
+>
+> In the zero-gradient local limit, the spatial-trace part of the linear Einstein equations in these units is
+>
+> $$
+> \partial_\tau^2\Phi_{\mathrm{metric}}=\frac{4\pi}{\mu^2}p_{\mathrm{loc}}.
+> $$
+>
+> Projecting this equation onto $\cos(2\omega\tau)$ gives
+>
+> $$
+> -4\omega^2\Phi_2^{\mathrm{local}}=\frac{4\pi}{\mu^2}p_{2,\mathrm{loc}},
+> $$
+>
+> and therefore
+>
+> $$
+> \Phi_2^{\mathrm{local}}=\frac{\phi_{1,\mathrm{PG}}^2}{16}+O(\epsilon^2\phi_{1,\mathrm{PG}}^2).
+> $$
+>
+> One also finds $\Psi_2^{\mathrm{local}}\approx-\Phi_2^{\mathrm{local}}$ (e.g., by directly solving the linearized Einstein equation with a scalar plane-wave source, and taking the long-wavelength limit).
+>
+> The equivalent cosmological-perturbation statement is obtained by writing the same local homogeneous mode as
+> $$
+> ds^2=a_{\mathrm{loc}}(\tau,R)^2(-d\tau^2+d\mathbf X^2),\qquad a_{\mathrm{loc}}=1+s_2(R)\cos(2\omega\tau).
+> $$
+>
+> The linear acceleration equation, $\partial_\tau^2a_{\mathrm{loc}}/a_{\mathrm{loc}}=-(4\pi/3\mu^2)(\varrho_{\mathrm{loc}}+3p_{\mathrm{loc}})$, gives
+>
+> $$
+> s_2=-\frac{\phi_{1,\mathrm{PG}}^2}{16}+O(\epsilon^2\phi_{1,\mathrm{PG}}^2).
+> $$
+>
+> Comparing $a_{\mathrm{loc}}^2=1+2s_2\cos(2\omega\tau)$ with $ds^2=-(1+2\Psi)d\tau^2+(1-2\Phi_{\mathrm{metric}})d\mathbf X^2$ gives $\Psi_2=s_2$ and $\Phi_2=-s_2$. Thus the local real-scalar estimate and the local scale-factor-oscillation result are the same leading-order statement:
 >
 > $$
 > -\Psi_2^{\mathrm{local}}=\Phi_2^{\mathrm{local}}=\frac{\phi_{1,\mathrm{PG}}^2}{16}.
 > $$
 >
+> Equivalently, the density relation is
+> $$
+> \phi_{1,\mathrm{PG}}^2=16\pi\frac{\varrho_{\mathrm{loc}}}{\mu^2},
+> $$
+>
+> where $\varrho_{\mathrm{loc}}$ is the local physical energy density entering the weak-field estimate, not the scaled plotting radius `rho`. The oscillating metric is sourced by the local pressure oscillation; writing the answer in terms of $\varrho_{\mathrm{loc}}$ is possible because the pressure amplitude equals $\varrho_{\mathrm{loc}}$ at leading nonrelativistic order.
+>
 > Equivalently, $h_{00}=g_{\tau\tau}^{\mathrm{PG}}+1=-2\Psi+\cdots$ has $h_{00,2}^{\mathrm{local}}=\phi_{1,\mathrm{PG}}^2/8$. When plotting the potentials $-\Psi_2$ and $\Phi_2$ themselves, the reference curve is $\phi_{1,\mathrm{PG}}^2/16$.
+> $\blacksquare$
 >
 > The natural scaled radius for this transformed comparison is
 >
 > $$
-> \rho_{\mathrm{plot}}=\epsilon R,\qquad \epsilon=\sqrt{1-\omega^2}.
+> \tilde\rho=\epsilon R,\qquad \epsilon=\sqrt{1-\omega^2}.
 > $$
 >
-> In the weak scalar SP limit, $\epsilon\simeq\kappa$ and $R\simeq x$, so this agrees with the older SP-scaled radius $\kappa x$.
+> In the weak scalar SP limit, $\epsilon=\kappa\sqrt{V_\infty}+O(\kappa^3)$ and $R\simeq x$, so $\tilde\rho=\sqrt{V_\infty}\,\kappa x+O(\kappa^3x)$.
 
 ## Scalar Field
 
@@ -300,12 +350,14 @@ Basic numerical checks are: `profile.metadata["success"]` should be true, `profi
 
 ## Nonrelativistic References
 
+Here we use the scalar SP and radial-vector SP solutions in the nonrelativistic approximation to construct the corresponding $\{A_0(x),C_0(x),M({<}x)\}$ profiles.
+
 > Start from the nonrelativistic real-scalar ansatz
 >
 > $$
-> \Phi=\frac{1}{\sqrt{2\mu}}\left(\psi e^{-i\mu t}+\psi^*e^{i\mu t}\right),
+> \Phi=\frac{1}{\sqrt{2\mu}}\left(\psi e^{-i\mu t_\text{phys}}+\psi^*e^{i\mu t_\text{phys}}\right),
 > \qquad
-> \psi=f(r)e^{-i\mathcal{E}t}.
+> \psi=f(r)e^{-i\mathcal{E}t_\text{phys}}.
 > $$
 >
 > Introducing
@@ -317,15 +369,15 @@ Basic numerical checks are: `profile.metadata["success"]` should be true, `profi
 > V(x)=2\left(\Phi_N-\frac{\mathcal{E}}{\mu}\right),
 > $$
 >
-> the Schrödinger-Poisson equation ($i\partial_t\psi=-\frac{\nabla^2\psi}{2\mu}+\mu\Phi_N\psi$, $\nabla^2\Phi_N=4\pi\mu|\psi|^2$) reduces to
+> the Schrodinger-Poisson (SP) equation ($i\partial_{t_\text{phys}}\psi=-\frac{\nabla^2\psi}{2\mu}+\mu\Phi_N\psi$, $\nabla^2\Phi_N=4\pi\mu|\psi|^2$) reduces to
 >
 > $$
-> F''+\frac{2}{x}F'=VF,
+> \partial_x^2F+\frac{2}{x}\partial_xF=VF,
 > \qquad
-> V''+\frac{2}{x}V'=F^2.
+> \partial_x^2V+\frac{2}{x}\partial_xV=F^2.
 > $$
 >
-> (prime denotes $\partial_x$) The scaling symmetry can be introduced afterwards:
+> The scaling symmetry can be introduced afterwards:
 >
 > $$
 > F_\kappa(x)=\kappa^2F_1(\kappa x),
@@ -333,47 +385,49 @@ Basic numerical checks are: `profile.metadata["success"]` should be true, `profi
 > V_\kappa(x)=\kappa^2V_1(\kappa x),
 > $$
 >
-> With $F_1(0)=1$, this gives $F_\kappa(0)=\kappa^2$. The ansatz above gives $\widehat{\Phi}_1=\sqrt{8\pi}\sqrt{2/\mu}\,f$, while $F_\kappa=\sqrt{8\pi/\mu}\,f$, so the rescaled-field Fourier coefficient is $\phi_1=\sqrt{2}\,F_\kappa$. With $y=\kappa x$, this gives $F_1(y)=\phi_1(y/\kappa)/(\sqrt{2}\,\kappa^2)$.
+> With $F_1(0)=1$, this gives $F_\kappa(0)=\kappa^2$. The ansatz above gives $\Phi=\sqrt{2/\mu}\,f\cos\left[(\mu+\mathcal{E})t_\text{phys}\right]$, so $\widehat{\Phi}_1=\sqrt{8\pi}\sqrt{2/\mu}\,f$, while $F_\kappa=\sqrt{8\pi/\mu}\,f$, so the rescaled-field Fourier coefficient is $\phi_1=\sqrt{2}\,F_\kappa$. With $y=\kappa x$, this gives $F_1(y)=\phi_1(y/\kappa)/(\sqrt{2}\,\kappa^2)$. The energy level is $\mathcal{E}/\mu=-\frac{1}{2}\kappa^2V_1(\infty)$, or $\omega=(\mu+\mathcal{E})/\mu=1-\frac{1}{2}\kappa^2V_1(\infty)$.
 >
 > -------
 >
-> In the Proca case, the SP equation reads
+> In the Proca case, the SP equation is
 > $$
-> i\partial_t\vec\psi=-\frac{\nabla^2\vec\psi}{2\mu}+\mu\Phi_N\vec\psi,\quad \nabla^2\Phi_N=4\pi\mu|\vec \psi|^2.
+> i\partial_{t_\text{phys}}\vec\psi=-\frac{\nabla^2\vec\psi}{2\mu}+\mu\Phi_N\vec\psi,\quad \nabla^2\Phi_N=4\pi\mu|\vec \psi|^2.
 > $$
 >
 > Here we use the radial spherical sector
 >
 > $$
-> \vec\psi=f(r)e^{-i\mathcal{E}t}\vec e_r.
+> \vec\psi=f(r)e^{-i\mathcal{E}t_\text{phys}}\vec e_r.
 > $$
 >
-> The vector Laplacian of a radial vector field is
+> Using
 >
 > $$
-> \nabla^2\left(f(r)\vec e_r\right)=\left(f''+\frac{2}{r}f'-\frac{2}{r^2}f\right)\vec e_r.
+> \nabla^2\left[f(r)\vec e_r\right]=\left(\partial_r^2f+\frac{2}{r}\partial_rf-\frac{2}{r^2}f\right)\vec e_r.
 > $$
 >
-> Therefore
+> the SP equation reads
 >
 > $$
-> f''+\frac{2}{r}f'-\frac{2}{r^2}f=2\mu(\mu\Phi_N-\mathcal{E})f.
+> \partial_r^2f+\frac{2}{r}\partial_rf-\frac{2}{r^2}f=2\mu(\mu\Phi_N-\mathcal{E})f.
 > $$
 >
 > Using the same dimensionless definitions $x=\mu r$, $F=\sqrt{8\pi/\mu}\,f$, and $V=2(\Phi_N-\mathcal{E}/\mu)$ gives
 >
 > $$
-> F''+\frac{2}{x}F'-\frac{2}{x^2}F=VF,
+> \partial_x^2F+\frac{2}{x}\partial_xF-\frac{2}{x^2}F=VF,
 > \qquad
-> V''+\frac{2}{x}V'=F^2.
+> \partial_x^2V+\frac{2}{x}\partial_xV=F^2.
 > $$
 >
-> *Note that there is an extra $-2F/x^2$ term.* Regularity at the origin requires $F(0)=0$, and the scaling freedom is fixed here by choosing $F'(0)=1$. The radial-vector scaling symmetry is written with $\lambda$:
+> *Note that there is an extra $-2F/x^2$ term.* Regularity at the origin requires $F(0)=0$, and the scaling freedom is fixed here by choosing $\partial_xF(0)=1$. The radial-vector scaling symmetry is written with $\lambda$:
 > $$
 > F_\lambda(x)=\lambda^2F_1(\lambda x),
 > \qquad
 > V_\lambda(x)=\lambda^2V_1(\lambda x).
 > $$
+
+Below we denote $F=F_1$, $V=V_1$, and $V_\infty=V_1(\infty)$.
 
 For the scalar branch, define the scaled radius by
 $$
@@ -413,7 +467,7 @@ $$
 With these definitions, the scalar SP ground state solves
 
 $$
-F''+\frac{2}{y}F'=VF, \qquad V''+\frac{2}{y}V'=F^2.
+\partial_y^2F+\frac{2}{y}\partial_yF=VF, \qquad \partial_y^2V+\frac{2}{y}\partial_yV=F^2.
 $$
 
 The inverse relation for the relativistic scalar profile is
@@ -457,11 +511,11 @@ The minus sign is the code convention for positive `u1_center`. The first Proca 
 $$
 u_1(x)=\lambda^3
 \left[
-F'(\lambda x)+\frac{2F(\lambda x)}{\lambda x}
+\partial_yF(\lambda x)+\frac{2F(\lambda x)}{\lambda x}
 \right]+O(\lambda^5).
 $$
 
-Thus, for the normalization $F'(0)=1$, one has $u_1(0)=3\lambda^3+O(\lambda^5)$. The radial-vector SP potential $V$ is defined from the metric in the same way as above,
+Thus, for the normalization $\partial_yF(0)=1$, one has $u_1(0)=3\lambda^3+O(\lambda^5)$. The radial-vector SP potential $V$ is defined from the metric in the same way as above,
 
 $$
 V_\infty=\lim_{\lambda\to0}\frac{1-\omega^2}{\lambda^2},
@@ -473,7 +527,7 @@ $$
 The radial-vector SP ground state solves
 
 $$
-F''+\frac{2}{y}F'-\frac{2}{y^2}F=VF, \qquad V''+\frac{2}{y}V'=F^2.
+\partial_y^2F+\frac{2}{y}\partial_yF-\frac{2}{y^2}F=VF, \qquad \partial_y^2V+\frac{2}{y}\partial_yV=F^2.
 $$
 
 The total mass and binding scale as
@@ -497,7 +551,7 @@ $$
 | `tol` | Boundary-value solver tolerance. |
 | `mass_tol` | Relative tolerance used by the mass-tuning wrapper. |
 | `x_max` | Outer radial boundary in dimensionless radius $x$. |
-| `rho` | Scaled plotting radius. The scalar/vector/SP comparison uses $\rho=\kappa x$; the Poisson-gauge local-estimate comparison uses $\rho=\epsilon R$. |
+| `rho` | Scaled plotting radius. The scalar/vector/SP comparison uses $\rho=\kappa x$; the Poisson-gauge local-estimate comparison uses $\tilde\rho=\epsilon R$. |
 | `A0`, `C0` | Code arrays storing the zero Fourier modes of `A` and `C`. |
 | `A2`, `C2` | Code arrays storing the second Fourier modes of `A` and `C`. |
 | `M0` | Code array storing $M({<}x)=x(1-1/A_0)/2$, the enclosed-mass function built from the zero Fourier mode of `A`. |
