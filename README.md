@@ -1,6 +1,6 @@
 # Spherical Soliton & Oscillaton Constructor
 
-Numerical constructors for spherically symmetric real scalar and Proca oscillatons in polar-areal gauge. The code also includes scalar SP and radial-vector SP reference profiles for weak-field comparisons.
+Numerical constructors for **spherically symmetric** real scalar and Proca oscillatons in **polar-areal gauge**. The code also includes scalar SP and radial-vector SP reference profiles for weak-field comparisons.
 
 <p align="center">
   <img src="figures/proca_g00_m6e-1.gif" alt="Time-dependent density plot of the Proca oscillaton g00 profile in the phi=0 plane" width="420" style="border-radius:50%;">
@@ -17,7 +17,7 @@ $$
 
 For this ansatz, $B^i=\frac{1}{2}\epsilon^{ijk}F_{jk}=0$. The tensor $\epsilon^{ijk}$ is the Levi-Civita tensor on the spatial slice, with $\epsilon^{ijk}=\frac{[ijk]}{\sqrt{\gamma}}$, where $[ijk]$ is the Levi-Civita symbol and $\gamma=\det\gamma_{ij}$. In polar-areal coordinates, $\gamma_{ij}dx^idx^j=A(t,x)\,dx^2+x^2d\Omega^2$, $\sqrt{\gamma}=\sqrt{A(t,x)}\,x^2\sin\theta$. For the ansatz above, $F_{x\theta}=F_{\theta\phi}=F_{\phi x}=0$, so $B^i=0$.
 
-It is not a generic 3D Proca solver. Note that in the nonrelativistic limit this branch reduces to the radial-vector SP equation, not to the scalar SP equation.
+In the nonrelativistic limit this branch reduces to the radial-vector SP equation, not to the scalar SP equation.
 
 ## Units
 
@@ -27,7 +27,7 @@ $$
 x=\mu r_{\mathrm{phys}}, \qquad t=\mu t_{\mathrm{phys}}.
 $$
 
-where $\mu$ is the boson mass. Also, $\omega_{\mathrm{phys}}=\mu\omega$. The code uses $G=c=\hbar=1$.
+Here $\mu$ is the boson mass, $\omega_{\mathrm{phys}}=\mu\omega$, and $G=c=\hbar=1$.
 
 The physical Klein-Gordon field is $\Phi$. Internally, the scalar constructor uses the rescaled field $\widehat{\Phi}\equiv\sqrt{8\pi}\,\Phi$.
 
@@ -63,13 +63,11 @@ $$
 M(t,x)=\frac{x}{2}\left(1-\frac{1}{A(t,x)}\right),
 $$
 
-The code also uses the enclosed-mass notation built from the zero Fourier mode of $A$,
+The code also uses the enclosed-mass notation built from $A_0$,
 
 $$
 M({<}x)=\frac{x}{2}\left(1-\frac{1}{A_0(x)}\right).
 $$
-
-This is the quantity stored as `M0` in the examples. It is not the Fourier zero mode of $M(t,x)$ itself, because $[1/A]_0\ne1/A_0$ in general.
 
 ## Spherical Poisson-Gauge Convention
 
@@ -91,16 +89,25 @@ $$
 t=\tau+T(\tau,R),\qquad x=R+L(\tau,R),
 $$
 
-and impose
+and impose the spherical Poisson-like coordinate conditions
 
 $$
-g_{\tau R}=0,\qquad g_{RR}=\frac{g_{\theta\theta}}{R^2}\equiv \chi(\tau,R),
+(g^{\mathrm{PG}})_{\tau R}=0,\qquad
+(g^{\mathrm{PG}})_{RR}=\frac{(g^{\mathrm{PG}})_{\theta\theta}}{R^2}\equiv \chi(\tau,R),
+\qquad
+(g^{\mathrm{PG}})_{\phi\phi}=\chi(\tau,R)R^2\sin^2\theta .
 $$
 
-such that $ds^2=-g_{\tau\tau}d\tau^2+g_{RR}[dR^2+R^2(d\theta^2+\sin^2\theta\,d\phi^2)]$. These are exact defining conditions. They become the usual Cartesian Poisson gauge only after expanding around flat space, where
+The transformed line element is
 
 $$
-g_{\tau\tau}^{\mathrm{PG}}=-(1+2\Psi+\cdots),\qquad \chi=1-2\Phi_{\mathrm{metric}}+\cdots .
+ds^2=(g^{\mathrm{PG}})_{\tau\tau}d\tau^2+\chi(\tau,R)[dR^2+R^2(d\theta^2+\sin^2\theta\,d\phi^2)],\qquad (g^{\mathrm{PG}})_{\tau\tau}<0.
+$$
+
+These are exact defining conditions. They become the usual Cartesian Poisson gauge only after expanding around flat space. In that expansion,
+
+$$
+(g^{\mathrm{PG}})_{\tau\tau}=-(1+2\Psi+\cdots),\qquad \chi=1-2\Phi_{\mathrm{metric}}+\cdots .
 $$
 
 For any periodic quantity $Q(\tau,R)$, write the Fourier series at fixed $R$ as
@@ -109,16 +116,16 @@ $$
 Q(\tau,R)=Q_0(R)+\sum_{n\ge1}\left[Q_{n,c}(R)\cos(n\omega\tau)+Q_{n,s}(R)\sin(n\omega\tau)\right].
 $$
 
-The coefficient used below is the cosine coefficient at frequency $2\omega$,
+The cosine coefficient at frequency $2\omega$ is
 
 $$
 [Q]_{2\omega}\equiv Q_{2,c}(R)=\frac{\omega}{\pi}\int_{\tau_0}^{\tau_0+2\pi/\omega}Q(\tau,R)\cos(2\omega\tau)\,d\tau .
 $$
 
-The numerical potentials are then
+For an exactly transformed solution, the corresponding cosine amplitudes define the potentials:
 
 $$
--\Psi_2^{\mathrm{num}}=\frac{1}{2}[g_{\tau\tau}^{\mathrm{PG}}+1]_{2\omega},
+-\Psi_2^{\mathrm{num}}=\frac{1}{2}[(g^{\mathrm{PG}})_{\tau\tau}+1]_{2\omega},
 $$
 
 $$
@@ -130,6 +137,54 @@ For the scalar oscillaton, the transformed scalar fundamental mode is the cosine
 $$
 \phi_{1,\mathrm{PG}}(R)=\frac{\omega}{\pi}\int_{\tau_0}^{\tau_0+2\pi/\omega}
 \widehat{\Phi}(t(\tau,R),x(\tau,R))\cos(\omega\tau)\,d\tau .
+$$
+
+### Weak-field overlap used by the scalar local-estimate example
+
+The example <code>examples/compare_scalar_local_estimate.py</code> uses a weak-field overlap of the spherical conditions above rather than a full time-dependent coordinate integration. The static part first maps the areal radius to the isotropic radius from `A0`, and the oscillating coordinate shifts are solved on the original areal-radius grid.
+
+$$
+L(\tau,R)=L(x)\cos(2\omega\tau),\qquad T(\tau,R)=S(x)\sin(2\omega\tau).
+$$
+
+Primes in the following equations denote derivatives with respect to the areal coordinate.  The finite-domain overlap solve uses zero shift amplitudes at the outer edge of the computed profile.
+
+$$
+\frac{dL}{dx}=\left(\frac{1}{x}-\frac{A_0'}{2A_0}\right)L-\frac{A_2}{2A_0},\qquad
+\frac{dS}{dx}=-2\omega C_0L.
+$$
+
+For the static comparison,
+
+$$
+B_0=\frac{A_0}{C_0},\qquad B_2=\frac{A_2}{C_0}-\frac{A_0C_2}{C_0^2},
+$$
+
+$$
+(g^{\mathrm{PG}})_{\tau\tau,0}=-B_0,\qquad
+\chi_0=\left(\frac{x}{R}\right)^2,\qquad
+-\Psi_0^{\mathrm{PG}}=\frac{1-B_0}{2},\qquad
+-\Phi_0^{\mathrm{PG}}=\frac{\chi_0-1}{2}.
+$$
+
+Static curves use the superscript $\mathrm{PG}$. Oscillating amplitudes from the weak-field overlap use the superscript $\mathrm{overlap}$.
+
+The overlap amplitudes plotted in the local-estimate example are given by the next two equations.
+
+$$
+h_{00,2}^{\mathrm{overlap}}=-(B_2+LB_0')-4\omega B_0S,\qquad
+\chi_2^{\mathrm{overlap}}=\frac{2xL}{R^2},
+$$
+
+$$
+-\Psi_2^{\mathrm{overlap}}=\frac{1}{2}h_{00,2}^{\mathrm{overlap}},\qquad
+\Phi_2^{\mathrm{overlap}}=-\frac{1}{2}\chi_2^{\mathrm{overlap}}.
+$$
+
+The scalar coefficient at the same order is
+
+$$
+\phi_{1,\mathrm{PG}}^{\mathrm{overlap}}=\phi_1+\frac{1}{2}L\phi_1'-\frac{1}{2}\omega S\phi_1.
 $$
 
 ### Local estimate in the scalar case
@@ -182,21 +237,19 @@ $$
 s_2=-\frac{\phi_{1,\mathrm{PG}}^2}{16}+O(\epsilon^2\phi_{1,\mathrm{PG}}^2).
 $$
 
-Comparing $a_{\mathrm{loc}}^2=1+2s_2\cos(2\omega\tau)$ with $ds^2=-(1+2\Psi)d\tau^2+(1-2\Phi_{\mathrm{metric}})d\mathbf X^2$ gives $\Psi_2=s_2$ and $\Phi_2=-s_2$. Thus the local real-scalar estimate and the local scale-factor-oscillation result are the same leading-order statement:
+Comparing $a_{\mathrm{loc}}^2=1+2s_2\cos(2\omega\tau)$ with $ds^2=-(1+2\Psi)d\tau^2+(1-2\Phi_{\mathrm{metric}})d\mathbf X^2$ gives $\Psi_2=s_2$ and $\Phi_2=-s_2$. The local real-scalar estimate and the local scale-factor-oscillation result are the same leading-order statement:
 
 $$
 -\Psi_2^{\mathrm{local}}=\Phi_2^{\mathrm{local}}=\frac{\phi_{1,\mathrm{PG}}^2}{16}.
 $$
 
-Equivalently, the density relation is
+The density relation is
 
 $$
-\phi_{1,\mathrm{PG}}^2=16\pi\frac{\varrho_{\mathrm{loc}}}{\mu^2},
+\phi_{1,\mathrm{PG}}^2=16\pi\frac{\varrho_{\mathrm{loc}}}{\mu^2}.
 $$
 
-where $\varrho_{\mathrm{loc}}$ is the local physical energy density entering the weak-field estimate, not the scaled plotting radius `rho`. The oscillating metric is sourced by the local pressure oscillation; writing the answer in terms of $\varrho_{\mathrm{loc}}$ is possible because the pressure amplitude equals $\varrho_{\mathrm{loc}}$ at leading nonrelativistic order.
-
-Equivalently, $h_{00}=g_{\tau\tau}^{\mathrm{PG}}+1=-2\Psi+\cdots$ has $h_{00,2}^{\mathrm{local}}=\phi_{1,\mathrm{PG}}^2/8$. When plotting the potentials $-\Psi_2$ and $\Phi_2$ themselves, the reference curve is $\phi_{1,\mathrm{PG}}^2/16$.
+With the covariant Poisson-like gauge component, $h_{00}=(g^{\mathrm{PG}})_{\tau\tau}+1=-2\Psi+\cdots$, so $h_{00,2}^{\mathrm{local}}=\phi_{1,\mathrm{PG}}^2/8$. The plotted local estimate for $-\Psi_2$ and $\Phi_2$ is $\phi_{1,\mathrm{PG}}^2/16$.
 
 The natural scaled radius for this transformed comparison is
 
@@ -318,7 +371,7 @@ e_j(x_{\min})&=-\frac{x_{\min}}{3}\,[\sqrt{C}\,U]_j(x_{\min})\qquad (j\in\mathca
 \end{aligned}
 $$
 
-Here $[\sqrt{C}\,U]_j$ is the cosine Fourier coefficient of $\sqrt{C(t,x_{\min})}\,U(t,x_{\min})$ at odd matter mode $j$. This is the regular-origin Gauss-law condition for the radial electric coefficients.
+Here $[\sqrt{C}\,U]_j$ is the cosine Fourier coefficient of $\sqrt{C(t,x_{\min})}\,U(t,x_{\min})$ at odd matter mode $j$. It enforces the regular-origin Gauss-law condition for the radial electric coefficients.
 
 The Proca outer matter condition is applied mode by mode for $j\in\mathcal J_{\mathrm{m}}$. For $j\omega<1$, define
 
@@ -352,7 +405,7 @@ Basic numerical checks are: `profile.metadata["success"]` should be true, `profi
 
 ## Nonrelativistic References
 
-Here we use the scalar SP and radial-vector SP solutions in the nonrelativistic approximation to construct the corresponding $\{A_0(x),C_0(x),M({<}x)\}$ profiles.
+The scalar SP and radial-vector SP solutions in the nonrelativistic approximation give the corresponding $\{A_0(x),C_0(x),M({<}x)\}$ profiles.
 
 Start from the nonrelativistic real-scalar ansatz
 
@@ -395,7 +448,7 @@ $$
 i\partial_{t_{\mathrm{phys}}}\vec\psi=-\frac{\nabla^2\vec\psi}{2\mu}+\mu\Phi_N\vec\psi,\quad \nabla^2\Phi_N=4\pi\mu|\vec \psi|^2.
 $$
 
-Here we use the radial spherical sector
+Use the radial spherical sector
 
 $$
 \vec\psi=f(r)e^{-i\mathcal{E}t_{\mathrm{phys}}}\vec e_r.
@@ -421,7 +474,7 @@ $$
 \partial_x^2V+\frac{2}{x}\partial_xV=F^2.
 $$
 
-Note that there is an extra $-2F/x^2$ term. Regularity at the origin requires $F(0)=0$, and the scaling freedom is fixed here by choosing $\partial_xF(0)=1$. The radial-vector scaling symmetry is written with $\lambda$:
+The extra $-2F/x^2$ term gives the radial-vector SP equation. Regularity at the origin requires $F(0)=0$, and the scaling freedom is fixed here by choosing $\partial_xF(0)=1$:
 
 $$
 F_\lambda(x)=\lambda^2F_1(\lambda x),
@@ -453,7 +506,7 @@ V(y)=V_\infty-\lim_{\kappa\to0}
 \frac{C_0(y/\kappa)-A_0(y/\kappa)}{\kappa^2}.
 $$
 
-Equivalently, if $\mathcal V_\kappa(x)=\kappa^2V(\kappa x)$ and primes on $\mathcal V_\kappa$ denote $d/dx$, the weak-field zero-mode metric profiles obey
+Equivalently, if $\mathcal V_\kappa(x)=\kappa^2V(\kappa x)$ and primes on $\mathcal V_\kappa$ denote $d/dx$, the weak-field metric profiles obey
 
 $$
 A_0(x)=1+x\mathcal V_\kappa'(x)+O(\kappa^4),
@@ -518,7 +571,7 @@ u_1(x)=\lambda^3
 \right]+O(\lambda^5).
 $$
 
-Thus, for the normalization $\partial_yF(0)=1$, one has $u_1(0)=3\lambda^3+O(\lambda^5)$. The radial-vector SP potential $V$ is defined from the metric in the same way as above,
+For the normalization $\partial_yF(0)=1$, $u_1(0)=3\lambda^3+O(\lambda^5)$. The radial-vector SP potential is
 
 $$
 V_\infty=\lim_{\lambda\to0}\frac{1-\omega^2}{\lambda^2},
@@ -555,9 +608,9 @@ $$
 | `mass_tol` | Relative tolerance used by the mass-tuning wrapper. |
 | `x_max` | Outer radial boundary in dimensionless radius $x$. |
 | `rho` | Scaled plotting radius. The scalar/vector/SP comparison uses $\rho=\kappa x$; the Poisson-gauge local-estimate comparison uses $\tilde\rho=\epsilon R$. |
-| `A0`, `C0` | Code arrays storing the zero Fourier modes of `A` and `C`. |
+| `A0`, `C0` | Code arrays storing $A_0$ and $C_0$. |
 | `A2`, `C2` | Code arrays storing the second Fourier modes of `A` and `C`. |
-| `M0` | Code array storing $M({<}x)=x(1-1/A_0)/2$, the enclosed-mass function built from the zero Fourier mode of `A`. |
+| `M0` | Code array storing $M({<}x)=x(1-1/A_0)/2$. |
 | `phi1_center` | Scalar central amplitude used as the scalar BVP input. |
 | `u1_center` | Vector central amplitude used as the vector BVP input. |
 
@@ -636,4 +689,4 @@ python examples/compare_scalar_local_estimate.py \
   --plot figures/scalar_poisson_potentials_vs_local_m1e-1.png
 ```
 
-This example first transforms the scalar oscillaton to the spherical Poisson-like gauge described above, then plots $-\Psi_2^{\mathrm{num}}$ and $\Phi_2^{\mathrm{num}}$ against the local estimate $\phi_{1,\mathrm{PG}}^2/16$.
+The first two panels compare the oscillating potential amplitudes with the local estimate. The third panel compares the static metric perturbations in the Poisson-like gauge with the SP Newtonian potential.
