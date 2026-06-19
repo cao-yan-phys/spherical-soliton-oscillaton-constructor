@@ -5,7 +5,7 @@ Numerical constructors for spherically symmetric real scalar and Proca oscillato
 <p align="center">
   <img src="figures/proca_g00_m6e-1.gif" alt="Time-dependent density plot of the Proca oscillaton g00 profile in the phi=0 plane" width="420" style="border-radius:50%;">
 </p>
-<p align="center"><i>g</i><sub>00</sub>(t,x) of a spherical Proca oscillaton, with parameters: <code>mu=1, G=1, mu*M_ADM=0.600014874, omega=0.978575355, epsilon=0.205888987, jmax=6</code></p>
+<p align="center"><i>g</i><sub>00</sub>(t,x) of a spherical Proca oscillaton, with parameters: <code>mu*M_ADM=0.600014874, omega=0.978575355, epsilon=0.205888987, jmax=6</code></p>
 
 ## Scope
 
@@ -27,15 +27,15 @@ $$
 x=\mu r_{\mathrm{phys}}, \qquad t=\mu t_{\mathrm{phys}}.
 $$
 
-The code uses $\mu=1$ and $G=1$. The reported mass is the dimensionless ADM mass $\mu M_{\mathrm{ADM}}$.
+where $\mu$ is the boson mass. Also, $\omega_\text{phys}=\mu\omega$. The code uses $G=c=\hbar=1$.
+
+The physical Klein-Gordon field is $\Phi$. Internally, the scalar constructor uses the rescaled field $\widehat{\Phi}\equiv\sqrt{8\pi}\,\Phi$.
 
 The binding parameter is
 
 $$
-\epsilon=\sqrt{1-\left(\frac{\omega}{\mu}\right)^2},
+\epsilon=\sqrt{1-\omega^2}.
 $$
-
-which becomes $\epsilon=\sqrt{1-\omega^2}$ in the code units.
 
 ## Metric
 
@@ -79,7 +79,7 @@ $$
 ds^2=-(1+2\Psi)d\tau^2+(1-2\Phi_{\mathrm{metric}})\delta_{ij}dX^i dX^j .
 $$
 
-For a strictly spherical solution, the corresponding non-perturbative construction is an isotropic, Poisson-like gauge. Starting from
+For a spherical solution, the corresponding non-perturbative construction is an isotropic, Poisson-like gauge. Starting from
 
 $$
 ds^2=-\frac{A}{C}dt^2+A\,dx^2+x^2d\Omega^2,
@@ -125,41 +125,41 @@ $$
 \Phi_2^{\mathrm{num}}=-\frac{1}{2}[\chi-1]_{2\omega}.
 $$
 
-The transformed scalar fundamental mode is the cosine coefficient at frequency $\omega$,
-
-$$
-\phi_{1,\mathrm{PG}}(R)=\frac{\omega}{\pi}\int_{\tau_0}^{\tau_0+2\pi/\omega}
-\Phi_{\mathrm{code}}(t(\tau,R),x(\tau,R))\cos(\omega\tau)\,d\tau .
-$$
-
-With $\Phi_{\mathrm{code}}=\sqrt{8\pi G}\,\varphi_{\mathrm{phys}}$, the local real-scalar estimate gives
-
-$$
-\phi_{1,\mathrm{PG}}^2=16\pi G\frac{\varrho_{\mathrm{loc}}}{\mu^2},
-$$
-
-where $\varrho_{\mathrm{loc}}$ is the local physical energy density entering the weak-field estimate, not the scaled plotting radius `rho`. Therefore
-
-$$
--\Psi_2^{\mathrm{local}}=\Phi_2^{\mathrm{local}}=\frac{\phi_{1,\mathrm{PG}}^2}{16}.
-$$
-
-Equivalently, $h_{00}=g_{\tau\tau}^{\mathrm{PG}}+1=-2\Psi+\cdots$ has $h_{00,2}^{\mathrm{local}}=\phi_{1,\mathrm{PG}}^2/8$. When plotting the potentials $-\Psi_2$ and $\Phi_2$ themselves, the reference curve is $\phi_{1,\mathrm{PG}}^2/16$.
-
-The natural scaled radius for this transformed comparison is
-
-$$
-\rho_{\mathrm{plot}}=\epsilon R,\qquad \epsilon=\sqrt{1-(\omega/\mu)^2}.
-$$
-
-In the weak scalar SP limit, $\epsilon\simeq\kappa$ and $R\simeq x$, so this agrees with the older SP-scaled radius $\kappa x$.
+> For the scalar oscillaton, the transformed scalar fundamental mode is the cosine coefficient of the rescaled field at frequency $\omega$,
+>
+> $$
+> \phi_{1,\mathrm{PG}}(R)=\frac{\omega}{\pi}\int_{\tau_0}^{\tau_0+2\pi/\omega}
+> \widehat{\Phi}(t(\tau,R),x(\tau,R))\cos(\omega\tau)\,d\tau .
+> $$
+>
+> The *local* real-scalar estimate gives
+>
+> $$
+> \phi_{1,\mathrm{PG}}^2=16\pi\frac{\varrho_{\mathrm{loc}}}{\mu^2},
+> $$
+>
+> where $\varrho_{\mathrm{loc}}$ is the local physical energy density entering the weak-field estimate, not the scaled plotting radius `rho`. Therefore
+>
+> $$
+> -\Psi_2^{\mathrm{local}}=\Phi_2^{\mathrm{local}}=\frac{\phi_{1,\mathrm{PG}}^2}{16}.
+> $$
+>
+> Equivalently, $h_{00}=g_{\tau\tau}^{\mathrm{PG}}+1=-2\Psi+\cdots$ has $h_{00,2}^{\mathrm{local}}=\phi_{1,\mathrm{PG}}^2/8$. When plotting the potentials $-\Psi_2$ and $\Phi_2$ themselves, the reference curve is $\phi_{1,\mathrm{PG}}^2/16$.
+>
+> The natural scaled radius for this transformed comparison is
+>
+> $$
+> \rho_{\mathrm{plot}}=\epsilon R,\qquad \epsilon=\sqrt{1-\omega^2}.
+> $$
+>
+> In the weak scalar SP limit, $\epsilon\simeq\kappa$ and $R\simeq x$, so this agrees with the older SP-scaled radius $\kappa x$.
 
 ## Scalar Field
 
-The real scalar field has particle mass $\mu=1$ and no self-interaction. The Fourier ansatz is
+The constructor expands the fields as
 
 $$
-\Phi(t,x)=\sum_{\substack{j\ge 1\\ j\ \mathrm{odd}}}\phi_j(x)\cos(j\omega t),
+\widehat{\Phi}(t,x)=\sum_{\substack{j\ge 1\\ j\ \mathrm{odd}}}\phi_j(x)\cos(j\omega t),
 $$
 
 $$
@@ -300,10 +300,82 @@ Basic numerical checks are: `profile.metadata["success"]` should be true, `profi
 
 ## Nonrelativistic References
 
-The variables $F$ and $V$ are nonrelativistic limit variables. They are defined from a weak-field one-parameter family of relativistic solutions, not by an independent convention. Primes in the SP equations below mean derivatives with respect to the scaled radius $y$.
+> Start from the nonrelativistic real-scalar ansatz
+>
+> $$
+> \Phi=\frac{1}{\sqrt{2\mu}}\left(\psi e^{-i\mu t}+\psi^*e^{i\mu t}\right),
+> \qquad
+> \psi=f(r)e^{-i\mathcal{E}t}.
+> $$
+>
+> Introducing
+>
+> $$
+> x=\mu r,\qquad
+> F(x)=\sqrt{\frac{8\pi}{\mu}}\,f(r),
+> \qquad
+> V(x)=2\left(\Phi_N-\frac{\mathcal{E}}{\mu}\right),
+> $$
+>
+> the Schrödinger-Poisson equation ($i\partial_t\psi=-\frac{\nabla^2\psi}{2\mu}+\mu\Phi_N\psi$, $\nabla^2\Phi_N=4\pi\mu|\psi|^2$) reduces to
+>
+> $$
+> F''+\frac{2}{x}F'=VF,
+> \qquad
+> V''+\frac{2}{x}V'=F^2.
+> $$
+>
+> (prime denotes $\partial_x$) The scaling symmetry can be introduced afterwards:
+>
+> $$
+> F_\kappa(x)=\kappa^2F_1(\kappa x),
+> \qquad
+> V_\kappa(x)=\kappa^2V_1(\kappa x),
+> $$
+>
+> With $F_1(0)=1$, this gives $F_\kappa(0)=\kappa^2$. The ansatz above gives $\widehat{\Phi}_1=\sqrt{8\pi}\sqrt{2/\mu}\,f$, while $F_\kappa=\sqrt{8\pi/\mu}\,f$, so the rescaled-field Fourier coefficient is $\phi_1=\sqrt{2}\,F_\kappa$. With $y=\kappa x$, this gives $F_1(y)=\phi_1(y/\kappa)/(\sqrt{2}\,\kappa^2)$.
+>
+> -------
+>
+> In the Proca case, the SP equation reads
+> $$
+> i\partial_t\vec\psi=-\frac{\nabla^2\vec\psi}{2\mu}+\mu\Phi_N\vec\psi,\quad \nabla^2\Phi_N=4\pi\mu|\vec \psi|^2.
+> $$
+>
+> Here we use the radial spherical sector
+>
+> $$
+> \vec\psi=f(r)e^{-i\mathcal{E}t}\vec e_r.
+> $$
+>
+> The vector Laplacian of a radial vector field is
+>
+> $$
+> \nabla^2\left(f(r)\vec e_r\right)=\left(f''+\frac{2}{r}f'-\frac{2}{r^2}f\right)\vec e_r.
+> $$
+>
+> Therefore
+>
+> $$
+> f''+\frac{2}{r}f'-\frac{2}{r^2}f=2\mu(\mu\Phi_N-\mathcal{E})f.
+> $$
+>
+> Using the same dimensionless definitions $x=\mu r$, $F=\sqrt{8\pi/\mu}\,f$, and $V=2(\Phi_N-\mathcal{E}/\mu)$ gives
+>
+> $$
+> F''+\frac{2}{x}F'-\frac{2}{x^2}F=VF,
+> \qquad
+> V''+\frac{2}{x}V'=F^2.
+> $$
+>
+> *Note that there is an extra $-2F/x^2$ term.* Regularity at the origin requires $F(0)=0$, and the scaling freedom is fixed here by choosing $F'(0)=1$. The radial-vector scaling symmetry is written with $\lambda$:
+> $$
+> F_\lambda(x)=\lambda^2F_1(\lambda x),
+> \qquad
+> V_\lambda(x)=\lambda^2V_1(\lambda x).
+> $$
 
 For the scalar branch, define the scaled radius by
-
 $$
 y=\kappa x
 $$
@@ -315,7 +387,7 @@ F(y)=\lim_{\kappa\to0}
 \frac{\phi_1(y/\kappa)}{\sqrt{2}\,\kappa^2}.
 $$
 
-The scalar SP potential $V$ is the effective Schrodinger-Poisson potential including the frequency eigenvalue shift. In the code's polar-areal variables it is defined by
+The scalar SP potential $V$ is the effective potential including the frequency eigenvalue shift,
 
 $$
 V_\infty=\lim_{\kappa\to0}\frac{1-\omega^2}{\kappa^2},
@@ -368,7 +440,7 @@ $$
 M_{\mathrm{SP}}=\frac{1}{2}\int_0^\infty y^2F(y)^2\,dy.
 $$
 
-For the strict radial-vector branch, define the scaled radius by
+For the radial-vector branch, define the scaled radius by
 
 $$
 y=\lambda x
@@ -398,7 +470,7 @@ V(y)=V_\infty-\lim_{\lambda\to0}
 \frac{C_0(y/\lambda)-A_0(y/\lambda)}{\lambda^2}.
 $$
 
-The strict radial-vector SP ground state solves
+The radial-vector SP ground state solves
 
 $$
 F''+\frac{2}{y}F'-\frac{2}{y^2}F=VF, \qquad V''+\frac{2}{y}V'=F^2.
@@ -412,15 +484,13 @@ $$
 \epsilon=\lambda\sqrt{V_\infty}+O(\lambda^3).
 $$
 
-Note that there is an extra $-2F/y^2$ term in the radial-vector equation.
-
 ## Main Parameters
 
 | Name | Meaning |
 | --- | --- |
 | `target_mass` | Target dimensionless ADM mass $\mu M_{\mathrm{ADM}}$. |
-| `omega` | Eigenfrequency stored by the profile object; mathematically this is $\omega/\mu$, and the code uses $\mu=1$. |
-| `epsilon` | Binding parameter returned by `epsilon_from_omega`; mathematically $\epsilon=\sqrt{1-(\omega/\mu)^2}$. |
+| `omega` | Dimensionless eigenfrequency $\omega=\omega_{\mathrm{phys}}/\mu$ stored by the profile object. |
+| `epsilon` | Binding parameter returned by `epsilon_from_omega`; mathematically $\epsilon=\sqrt{1-\omega^2}$. |
 | `jmax` | Largest retained Fourier index. Matter modes are odd and metric modes are even. |
 | `n_grid` | Number of radial collocation points. |
 | `n_time` | Number of Fourier phase collocation points. |
@@ -461,7 +531,7 @@ vector_metric = zero_mode_metric_arrays(vector, vector.x)
 
 Profile objects expose `x`, `omega`, `mass`, `A0`, `C0`, `mass_profile`, `evaluate(theta)`, and `initial_data()`.
 
-For scalar profiles, `evaluate(theta)` returns `Phi`, `Phi_t`, `Phi_x`, `A`, `C`, `a`, and `alpha`.
+For scalar profiles, `evaluate(theta)` returns `Phi`, `Phi_t`, `Phi_x`, `A`, `C`, `a`, and `alpha` (the returned `Phi` is the rescaled field $\widehat{\Phi}$).
 
 For vector profiles, `evaluate(theta)` returns `U`, `E`, `E_t`, `W`, `A`, `C`, `a`, and `alpha`.
 

@@ -27,7 +27,7 @@ class OscillatonProfile:
     metadata: dict = field(default_factory=dict)
 
     def evaluate(self, theta: np.ndarray | float) -> dict[str, np.ndarray]:
-        """Evaluate `Phi`, `Phi_t`, `A`, `C`, `a`, and `alpha` at phase(s)."""
+        """Evaluate the rescaled `Phi`, `Phi_t`, `A`, `C`, `a`, and `alpha`."""
 
         theta_arr = np.atleast_1d(np.asarray(theta, dtype=float))
         Phi = evaluate_fourier_modes(self.scalar_modes, theta_arr, self.phi)
@@ -104,4 +104,3 @@ def empty_profile_like_grid(jmax: int, x: np.ndarray, phi1_center: float):
         "jmax": jmax,
         "phi1_center": phi1_center,
     }
-

@@ -10,7 +10,7 @@ from scipy.integrate import solve_bvp
 
 @dataclass
 class RadialProcaNRProfile:
-    """Ground state of the strict radial Proca NR equation.
+    """Ground state of the radial Proca NR equation.
 
     The equations are
 
@@ -121,7 +121,7 @@ def solve_radial_proca_nr_ground_state(
     verbose: int = 0,
     raise_on_fail: bool = True,
 ) -> RadialProcaNRProfile:
-    """Solve the strict radial Proca NR ground state."""
+    """Solve the radial Proca NR ground state."""
 
     if slope <= 0.0:
         raise ValueError("slope must be positive")

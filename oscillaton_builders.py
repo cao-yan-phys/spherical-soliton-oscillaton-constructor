@@ -17,10 +17,10 @@ from proca_oscillaton import (
 )
 
 
-def epsilon_from_omega(omega: float, mu: float = 1.0) -> float:
-    """Return epsilon = sqrt(1 - (omega / mu)^2)."""
+def epsilon_from_omega(omega: float) -> float:
+    """Return epsilon = sqrt(1 - omega^2) for dimensionless omega."""
 
-    return float(np.sqrt(max(0.0, 1.0 - (float(omega) / float(mu)) ** 2)))
+    return float(np.sqrt(max(0.0, 1.0 - float(omega) ** 2)))
 
 
 def zero_mode_mass(profile) -> float:
@@ -157,7 +157,7 @@ def construct_vector_oscillaton(
     mass_tol: float = 5.0e-5,
     reference=None,
 ):
-    """Construct a strict radial real Proca oscillaton at a target ADM mass."""
+    """Construct a radial real Proca oscillaton at a target ADM mass."""
 
     profile = construct_vector_reference() if reference is None else reference
     u1_center = profile.u1_center * (target_mass / profile.mass) ** 3
@@ -224,7 +224,7 @@ def scalar_sp_metric_arrays(x: np.ndarray, target_mass: float):
 
 
 def radial_proca_sp_metric_arrays(x: np.ndarray, target_mass: float):
-    """Return strict radial Proca SP metric arrays at the requested ADM mass."""
+    """Return radial Proca SP metric arrays at the requested ADM mass."""
 
     profile = solve_radial_proca_nr_ground_state(y_max=50.0, n_grid=900, tol=1.0e-7)
     scale = target_mass / profile.dimensionless_cloud_mass

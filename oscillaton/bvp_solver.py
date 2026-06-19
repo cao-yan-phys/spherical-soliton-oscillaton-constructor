@@ -50,7 +50,7 @@ def kappa_from_phi1_center(phi1_center: float) -> float:
 def phi1_center_from_sp_mass(target_mass: float) -> float:
     """Estimate ``phi_1(0)`` for a weak scalar oscillaton ADM mass.
 
-    In the SP limit, ``m M ~= SP_BASE_CLOUD_MASS * kappa`` and
+    In the SP limit, ``mu M ~= SP_BASE_CLOUD_MASS * kappa`` and
     ``phi_1(0) ~= sqrt(2) kappa^2``.
     """
 

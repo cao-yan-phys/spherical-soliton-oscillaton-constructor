@@ -14,9 +14,9 @@ class SPGroundState:
 
     The profile uses the Appendix-A variables
 
-        y = m r,
-        F = sqrt(8 pi / m) f,
-        V = 2 (Phi_c - E / m).
+        y = mu r,
+        F = sqrt(8 pi / mu) f,
+        V = 2 (Phi_c - E_NR / mu).
 
     The default normalization is F(0) = 1.  The scaling symmetry is
     F_kappa(y) = kappa**2 F_1(kappa y) and
@@ -45,7 +45,7 @@ class SPGroundState:
 
     @property
     def dimensionless_cloud_mass(self) -> float:
-        """Return m M_c = N_infinity / 2 in the Appendix-A convention."""
+        """Return mu M_c = N_infinity / 2 in the Appendix-A convention."""
 
         return 0.5 * self.mass_integral
 
@@ -56,8 +56,8 @@ class SPGroundState:
         return float(self.V[-1] + self.y[-1] * self.dV[-1])
 
     @property
-    def binding_energy_over_m(self) -> float:
-        """Return E/m when Phi_c(infinity) is set to zero."""
+    def binding_energy_over_mu(self) -> float:
+        """Return E_NR / mu when Phi_c(infinity) is set to zero."""
 
         return -0.5 * self.V_infinity
 

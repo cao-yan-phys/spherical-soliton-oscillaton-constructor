@@ -394,7 +394,7 @@ def main() -> None:
         rf"\mu M_{{\rm ADM}}^{{\rm Proca}}={proca.mass:.9g},\ "
         rf"\epsilon_{{\rm scalar}}={scalar_eps:.4g},\ "
         rf"\epsilon_{{\rm Proca}}={proca_eps:.4g}\ "
-        rf"(\epsilon=\sqrt{{1-(\omega/\mu)^2}})$"
+        rf"(\epsilon=\sqrt{{1-\omega^2}})$"
     )
     fig.tight_layout()
     fig.savefig(args.plot, dpi=180)
