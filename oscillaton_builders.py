@@ -16,9 +16,9 @@ from proca_oscillaton import (
 )
 
 
-def epsilon_from_omega(omega: float, mu: float = 1.0) -> float:
+def epsilon_from_omega(omega: float) -> float:
 
-    return float(np.sqrt(max(0.0, 1.0 - (float(omega) / float(mu)) ** 2)))
+    return float(np.sqrt(max(0.0, 1.0 - float(omega) ** 2)))
 
 
 def zero_mode_mass(profile) -> float:

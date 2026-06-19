@@ -100,4 +100,3 @@ def empty_profile_like_grid(jmax: int, x: np.ndarray, phi1_center: float):
         "jmax": jmax,
         "phi1_center": phi1_center,
     }
-

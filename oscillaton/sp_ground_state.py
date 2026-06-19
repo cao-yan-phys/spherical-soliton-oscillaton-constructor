@@ -39,7 +39,7 @@ class SPGroundState:
         return float(self.V[-1] + self.y[-1] * self.dV[-1])
 
     @property
-    def binding_energy_over_m(self) -> float:
+    def binding_energy_over_mu(self) -> float:
 
         return -0.5 * self.V_infinity
 
