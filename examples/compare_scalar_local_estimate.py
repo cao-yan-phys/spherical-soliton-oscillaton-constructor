@@ -360,7 +360,7 @@ def main() -> None:
     axes[2].legend(fontsize=10)
 
     fig.suptitle(
-        rf"Stable scalar Poisson-gauge overlap vs local estimate, "
+        rf"Scalar metric potentials in Poisson-like gauge, "
         rf"$\mu M_{{\mathrm{{ADM}}}}={zero_mode_mass(profile):.9g}$"
     )
     fig.tight_layout()
