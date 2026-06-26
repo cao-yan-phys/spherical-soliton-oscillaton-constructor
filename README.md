@@ -17,7 +17,7 @@ $$
 
 For this ansatz, $B^i=\frac{1}{2}\epsilon^{ijk}F_{jk}=0$. The tensor $\epsilon^{ijk}$ is the Levi-Civita tensor on the spatial slice, with $\epsilon^{ijk}=\frac{[ijk]}{\sqrt{\gamma}}$, where $[ijk]$ is the Levi-Civita symbol and $\gamma=\det\gamma_{ij}$. In polar-areal coordinates, $\gamma_{ij}dx^idx^j=A(t,x) dx^2+x^2d\Omega^2$, $\sqrt{\gamma}=\sqrt{A(t,x)} x^2\sin\theta$. For the ansatz above, $F_{x\theta}=F_{\theta\phi}=F_{\phi x}=0$, so $B^i=0$.
 
-In the nonrelativistic limit this branch reduces to the radial-vector SP equation, not to the scalar SP equation.
+In the nonrelativistic limit this reduces to the radial-vector SP equation, not to the scalar SP equation.
 
 ## Units
 
@@ -442,7 +442,7 @@ $$
 
 With $`F_1(0)=1`$, this gives $`F_\kappa(0)=\kappa^2`$. The ansatz above gives $`\Phi=\sqrt{2/\mu}\,f\cos\left[(\mu+\mathcal{E})t_{\mathrm{phys}}\right]`$, so $`\widehat{\Phi}_1=\sqrt{8\pi}\sqrt{2/\mu}\,f`$, while $`F_\kappa=\sqrt{8\pi/\mu}\,f`$, so the rescaled-field Fourier coefficient is $`\phi_1=\sqrt{2}\,F_\kappa`$. With $`y=\kappa x`$, this gives $`F_1(y)=\phi_1(y/\kappa)/(\sqrt{2}\,\kappa^2)`$. The energy level is $`\mathcal{E}/\mu=-\frac{1}{2}\kappa^2V_1(\infty)`$, or $`\omega=(\mu+\mathcal{E})/\mu=1-\frac{1}{2}\kappa^2V_1(\infty)`$.
 
-For the Proca case, the SP equation is
+In the Proca case, the SP equation is
 
 $$
 i\partial_{t_{\mathrm{phys}}}\vec\psi=-\frac{\nabla^2\vec\psi}{2\mu}+\mu\Phi_N\vec\psi,\quad \nabla^2\Phi_N=4\pi\mu|\vec \psi|^2.
@@ -484,7 +484,7 @@ $$
 
 Below we denote $F=F_1$, $V=V_1$, and $V_\infty=V_1(\infty)$.
 
-For the scalar branch, define the scaled radius by
+In the scalar case, define the scaled radius by
 
 $$
 y=\kappa x
@@ -550,7 +550,7 @@ $$
 M_{\mathrm{SP}}=\frac{1}{2}\int_0^\infty y^2F(y)^2 dy.
 $$
 
-For the radial-vector branch, define the scaled radius by
+In the Proca case, define the scaled radius by
 
 $$
 y=\lambda x
