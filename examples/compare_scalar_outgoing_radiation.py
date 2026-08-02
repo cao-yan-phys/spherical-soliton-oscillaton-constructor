@@ -75,7 +75,7 @@ def main() -> None:
         spine.set_linewidth(0.9)
     axis.set_title(
         rf"Scalar oscillaton outgoing radiation: $\omega={result.omega:.7f}$, "
-        rf"$M={result.mass:.7f}$",
+        rf"$\mu M_{{\mathrm{{ADM}}}}={result.mass:.7f}$",
         fontsize=13,
     )
     figure.savefig(args.output, dpi=220)

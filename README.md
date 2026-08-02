@@ -2,8 +2,6 @@
 
 Numerical constructors for spherically symmetric oscillatons of real scalar and real Proca fields.
 
-We use $G=c=\hbar=1$. Here $\mu$ is the Klein-Gordon or Proca field mass, and $M_{\mathrm{ADM}}$ is the ADM mass of the asymptotically flat configuration. The dimensionless mass used by the constructors is $\mu M_{\mathrm{ADM}}$, and the dimensionless frequency returned as `omega` is $\omega_{\mathrm{phys}}/\mu$.
-
 <p align="center">
   <img src="figures/proca_g00_m6e-1.gif" alt="Time-dependent Proca oscillaton metric profile" width="420" style="border-radius:50%;">
 </p>
@@ -17,7 +15,7 @@ cd spherical-soliton-oscillaton-constructor
 python -m pip install -r requirements.txt
 ```
 
-Run Python from the repository root. Relativistic profiles are constructed in polar-areal coordinates. The input `target_mass` is the dimensionless mass $\mu M_{\mathrm{ADM}}$ in units $G=c=\hbar=1$, and the returned `omega` is $\omega_{\mathrm{phys}}/\mu$.
+Relativistic profiles are constructed in polar-areal coordinates. The input `target_mass` is the dimensionless mass $\mu M_{\mathrm{ADM}}$ in units $G=c=\hbar=1$, where $\mu$ is the boson mass and $M_{\mathrm{ADM}}$ is the oscillaton mass. The returned `omega` is $\omega_{\mathrm{phys}}/\mu$.
 
 ## Basic Usage
 
