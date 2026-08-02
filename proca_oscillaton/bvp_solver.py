@@ -9,6 +9,43 @@ from .profiles import ProcaOscillatonProfile
 from .residuals import reconstruct_A_modes, rhs_reduced
 
 
+def _validate_solver_options(
+    *,
+    jmax: int,
+    x_max: float,
+    n_grid: int,
+    n_time: int,
+    tol: float,
+) -> None:
+    if jmax < 2 or jmax % 2:
+        raise ValueError("jmax must be an even integer >= 2")
+    if x_max <= 0.0:
+        raise ValueError("x_max must be positive")
+    if n_grid < 8:
+        raise ValueError("n_grid must be at least 8")
+    if n_time < 4:
+        raise ValueError("n_time must be at least 4")
+    if tol <= 0.0:
+        raise ValueError("tol must be positive")
+
+
+def _max_rms_residual(solution) -> float:
+    if solution.rms_residuals.size:
+        return float(np.max(solution.rms_residuals))
+    return float("nan")
+
+
+def _raise_if_unsuccessful(solution, *, label: str, jmax: int) -> None:
+    if solution.success:
+        return
+    residual = _max_rms_residual(solution)
+    raise RuntimeError(
+        f"{label} solve_bvp failed for jmax={jmax}: "
+        f"status={solution.status}, max_rms_residual={residual:.3e}, "
+        f"message={solution.message}"
+    )
+
+
 def _initial_guess(jmax: int, x: np.ndarray, u1_center: float) -> np.ndarray:
     modes = mode_set(jmax)
     y = np.zeros((reduced_state_size(jmax), x.size))
@@ -186,6 +223,7 @@ def _solve_single(
     initial_y_guess: np.ndarray | None = None,
     omega_guess: float | None = None,
     seed_metadata: dict | None = None,
+    require_success: bool,
     verbose: int,
 ) -> ProcaOscillatonProfile:
     x = np.linspace(1.0e-4, x_max, n_grid)
@@ -213,6 +251,8 @@ def _solve_single(
         max_nodes=max(10000, 40 * n_grid),
         verbose=verbose,
     )
+    if require_success:
+        _raise_if_unsuccessful(solution, label="Proca oscillaton", jmax=jmax)
     modes = mode_set(jmax)
     nm = modes.n_matter
     C_start = 2 * nm + 1
@@ -235,9 +275,7 @@ def _solve_single(
             "message": solution.message,
             "status": int(solution.status),
             "n_nodes": int(solution.x.size),
-            "max_rms_residual": float(np.max(solution.rms_residuals))
-            if solution.rms_residuals.size
-            else np.nan,
+            "max_rms_residual": _max_rms_residual(solution),
             **(seed_metadata or {}),
         },
     )
@@ -253,11 +291,19 @@ def solve_profile(
     tol: float = 1.0e-4,
     continuation: bool = True,
     previous: ProcaOscillatonProfile | None = None,
+    require_success: bool = True,
     verbose: int = 0,
 ) -> ProcaOscillatonProfile:
 
     if u1_center <= 0:
         raise ValueError("u1_center must be positive")
+    _validate_solver_options(
+        jmax=jmax,
+        x_max=x_max,
+        n_grid=n_grid,
+        n_time=n_time,
+        tol=tol,
+    )
     if previous is not None or not continuation or jmax == 2:
         return _solve_single(
             u1_center,
@@ -267,6 +313,7 @@ def solve_profile(
             n_time=n_time,
             tol=tol,
             previous=previous,
+            require_success=require_success,
             verbose=verbose,
         )
     profile = None
@@ -279,6 +326,7 @@ def solve_profile(
             n_time=n_time,
             tol=tol,
             previous=profile,
+            require_success=require_success,
             verbose=verbose,
         )
     assert profile is not None
@@ -294,6 +342,7 @@ def solve_profile_scaled_seeded(
     *,
     n_time: int = 96,
     tol: float = 1.0e-6,
+    require_success: bool = True,
     verbose: int = 0,
 ) -> ProcaOscillatonProfile:
 
@@ -305,6 +354,13 @@ def solve_profile_scaled_seeded(
     lam = float((u1_center / reference.u1_center) ** (1.0 / 3.0))
     if x_max is None:
         x_max = reference.x[-1] / lam
+    _validate_solver_options(
+        jmax=jmax,
+        x_max=x_max,
+        n_grid=n_grid,
+        n_time=n_time,
+        tol=tol,
+    )
 
     x = np.linspace(1.0e-4, x_max, n_grid)
     y_guess, omega, seed_metadata = _scaled_weak_field_guess(
@@ -321,6 +377,7 @@ def solve_profile_scaled_seeded(
         initial_y_guess=y_guess,
         omega_guess=omega,
         seed_metadata=seed_metadata,
+        require_success=require_success,
         verbose=verbose,
     )
 
@@ -333,8 +390,16 @@ def solve_family(
     n_grid: int = 500,
     n_time: int = 96,
     tol: float = 1.0e-4,
+    require_success: bool = True,
     verbose: int = 0,
 ) -> list[ProcaOscillatonProfile]:
+    _validate_solver_options(
+        jmax=jmax,
+        x_max=x_max,
+        n_grid=n_grid,
+        n_time=n_time,
+        tol=tol,
+    )
     profiles = []
     previous = None
     for value in u1_values:
@@ -347,6 +412,7 @@ def solve_family(
             tol=tol,
             continuation=False,
             previous=previous,
+            require_success=require_success,
             verbose=verbose,
         )
         profiles.append(profile)
