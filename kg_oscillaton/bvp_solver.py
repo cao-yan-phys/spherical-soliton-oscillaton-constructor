@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from functools import lru_cache
+
 import numpy as np
 from scipy.integrate import solve_bvp
 
@@ -16,6 +18,48 @@ from .sp_ground_state import solve_sp_ground_state
 
 
 SP_BASE_CLOUD_MASS = 1.734128080715
+
+
+@lru_cache(maxsize=16)
+def _cached_sp_ground_state(y_max: float, n_grid: int, tol: float):
+    return solve_sp_ground_state(y_max=y_max, n_grid=n_grid, tol=tol)
+
+
+def _validate_solver_options(
+    *,
+    jmax: int,
+    x_max: float,
+    n_grid: int,
+    n_time: int,
+    tol: float,
+) -> None:
+    if jmax < 2 or jmax % 2:
+        raise ValueError("jmax must be an even integer >= 2")
+    if x_max <= 0.0:
+        raise ValueError("x_max must be positive")
+    if n_grid < 8:
+        raise ValueError("n_grid must be at least 8")
+    if n_time < 4:
+        raise ValueError("n_time must be at least 4")
+    if tol <= 0.0:
+        raise ValueError("tol must be positive")
+
+
+def _max_rms_residual(solution) -> float:
+    if solution.rms_residuals.size:
+        return float(np.max(solution.rms_residuals))
+    return float("nan")
+
+
+def _raise_if_unsuccessful(solution, *, label: str, jmax: int) -> None:
+    if solution.success:
+        return
+    residual = _max_rms_residual(solution)
+    raise RuntimeError(
+        f"{label} solve_bvp failed for jmax={jmax}: "
+        f"status={solution.status}, max_rms_residual={residual:.3e}, "
+        f"message={solution.message}"
+    )
 
 
 def _initial_guess(jmax: int, x: np.ndarray, phi1_center: float) -> np.ndarray:
@@ -80,11 +124,9 @@ def _sp_initial_guess(
     y = np.zeros((reduced_state_size(jmax), x.size))
     kappa = kappa_from_phi1_center(phi1_center)
     z_max = float(kappa * x[-1])
-    sp_profile = solve_sp_ground_state(
-        y_max=sp_y_max or max(40.0, z_max),
-        n_grid=max(500, min(1800, int(25 * max(40.0, z_max)))),
-        tol=sp_tol,
-    )
+    y_max = float(sp_y_max or max(40.0, z_max))
+    n_sp = int(max(500, min(1800, int(25 * y_max))))
+    sp_profile = _cached_sp_ground_state(y_max, n_sp, float(sp_tol))
 
     z = kappa * x
     F = np.interp(z, sp_profile.y, sp_profile.F)
@@ -185,6 +227,7 @@ def _solve_single(
     initial_y_guess: np.ndarray | None = None,
     omega_guess: float | None = None,
     seed_metadata: dict | None = None,
+    require_success: bool,
     verbose: int,
 ) -> OscillatonProfile:
     x = np.linspace(1.0e-4, x_max, n_grid)
@@ -214,6 +257,8 @@ def _solve_single(
         max_nodes=max(10000, 40 * n_grid),
         verbose=verbose,
     )
+    if require_success:
+        _raise_if_unsuccessful(solution, label="scalar oscillaton", jmax=jmax)
 
     modes = mode_set(jmax)
     A_modes = reconstruct_A_modes(
@@ -225,9 +270,7 @@ def _solve_single(
         "success": bool(solution.success),
         "message": solution.message,
         "n_nodes": int(solution.x.size),
-        "max_rms_residual": float(np.max(solution.rms_residuals))
-        if solution.rms_residuals.size
-        else np.nan,
+        "max_rms_residual": _max_rms_residual(solution),
         "status": int(solution.status),
     }
     if seed_metadata:
@@ -257,6 +300,7 @@ def solve_profile(
     tol: float = 1.0e-4,
     continuation: bool = True,
     previous: OscillatonProfile | None = None,
+    require_success: bool = True,
     verbose: int = 0,
 ) -> OscillatonProfile:
     """Solve the Fourier eigenvalue problem for a central scalar amplitude.
@@ -267,8 +311,13 @@ def solve_profile(
 
     if phi1_center <= 0:
         raise ValueError("phi1_center must be positive")
-    if jmax % 2 != 0:
-        raise ValueError("jmax must be even")
+    _validate_solver_options(
+        jmax=jmax,
+        x_max=x_max,
+        n_grid=n_grid,
+        n_time=n_time,
+        tol=tol,
+    )
 
     if not continuation or previous is not None or jmax == 2:
         return _solve_single(
@@ -279,6 +328,7 @@ def solve_profile(
             n_time=n_time,
             tol=tol,
             previous=previous,
+            require_success=require_success,
             verbose=verbose,
         )
 
@@ -292,6 +342,7 @@ def solve_profile(
             n_time=n_time,
             tol=tol,
             previous=profile,
+            require_success=require_success,
             verbose=verbose,
         )
     assert profile is not None
@@ -308,6 +359,7 @@ def solve_profile_sp_seeded(
     tol: float = 5.0e-5,
     sp_y_max: float | None = None,
     sp_tol: float = 1.0e-6,
+    require_success: bool = True,
     verbose: int = 0,
 ) -> OscillatonProfile:
     """Solve a weak-field scalar oscillaton using the SP ground state as seed.
@@ -319,11 +371,16 @@ def solve_profile_sp_seeded(
 
     if phi1_center <= 0:
         raise ValueError("phi1_center must be positive")
-    if jmax % 2 != 0:
-        raise ValueError("jmax must be even")
     if x_max is None:
         kappa = kappa_from_phi1_center(phi1_center)
         x_max = max(80.0, 45.0 / kappa)
+    _validate_solver_options(
+        jmax=jmax,
+        x_max=x_max,
+        n_grid=n_grid,
+        n_time=n_time,
+        tol=tol,
+    )
 
     x = np.linspace(1.0e-4, x_max, n_grid)
     y_guess, omega_guess, seed_metadata = _sp_initial_guess(
@@ -344,6 +401,7 @@ def solve_profile_sp_seeded(
         initial_y_guess=y_guess,
         omega_guess=omega_guess,
         seed_metadata=seed_metadata,
+        require_success=require_success,
         verbose=verbose,
     )
 
@@ -356,10 +414,18 @@ def solve_family(
     n_grid: int = 800,
     n_time: int = 128,
     tol: float = 1.0e-4,
+    require_success: bool = True,
     verbose: int = 0,
 ) -> list[OscillatonProfile]:
     """Solve a family of profiles using amplitude continuation."""
 
+    _validate_solver_options(
+        jmax=jmax,
+        x_max=x_max,
+        n_grid=n_grid,
+        n_time=n_time,
+        tol=tol,
+    )
     profiles: list[OscillatonProfile] = []
     previous = None
     for value in phi1_values:
@@ -372,6 +438,7 @@ def solve_family(
             tol=tol,
             previous=previous,
             continuation=False,
+            require_success=require_success,
             verbose=verbose,
         )
         profiles.append(profile)

@@ -1,704 +1,80 @@
 # Spherical Soliton & Oscillaton Constructor
 
-Numerical constructors for **spherically symmetric** real scalar and Proca oscillatons in **polar-areal gauge**. The code also includes scalar SP and radial-vector SP reference profiles for weak-field comparisons.
+Numerical constructors for spherically symmetric oscillatons of real scalar and real Proca fields.
+
+We use $G=c=\hbar=1$. Here $\mu$ is the Klein-Gordon or Proca field mass, and $M_{\mathrm{ADM}}$ is the ADM mass of the asymptotically flat configuration. The dimensionless mass used by the constructors is $\mu M_{\mathrm{ADM}}$, and the dimensionless frequency returned as `omega` is $\omega_{\mathrm{phys}}/\mu$.
 
 <p align="center">
-  <img src="figures/proca_g00_m6e-1.gif" alt="Time-dependent density plot of the Proca oscillaton g00 profile in the phi=0 plane" width="420" style="border-radius:50%;">
+  <img src="figures/proca_g00_m6e-1.gif" alt="Time-dependent Proca oscillaton metric profile" width="420" style="border-radius:50%;">
 </p>
-<p align="center"><i>g</i><sub>00</sub>(t,x) of a spherical Proca oscillaton, with parameters: <code>mu*M_ADM=0.600014874, omega=0.978575355, epsilon=0.205888987, jmax=6</code></p>
+<p align="center"><i>g</i><sub>00</sub>(t,x) of a spherical Proca oscillaton; parameters: <code>mu*M_ADM=0.600014874, omega=0.978575355, epsilon=0.205888987, jmax=6</code></p>
 
-## Scope
+## Installation
 
-The vector constructor is restricted to the spherical sector,
+```bash
+git clone https://github.com/cao-yan-phys/spherical-soliton-oscillaton-constructor.git
+cd spherical-soliton-oscillaton-constructor
+python -m pip install -r requirements.txt
+```
 
-$$
-X_\mu dx^\mu = U(t,x) dt + W(t,x) dx .
-$$
+Run Python from the repository root. Relativistic profiles are constructed in polar-areal coordinates. The input `target_mass` is the dimensionless mass $\mu M_{\mathrm{ADM}}$ in units $G=c=\hbar=1$, and the returned `omega` is $\omega_{\mathrm{phys}}/\mu$.
 
-For this ansatz, $B^i=\frac{1}{2}\epsilon^{ijk}F_{jk}=0$. The tensor $\epsilon^{ijk}$ is the Levi-Civita tensor on the spatial slice, with $\epsilon^{ijk}=\frac{[ijk]}{\sqrt{\gamma}}$, where $[ijk]$ is the Levi-Civita symbol and $\gamma=\det\gamma_{ij}$. In polar-areal coordinates, $\gamma_{ij}dx^idx^j=A(t,x) dx^2+x^2d\Omega^2$, $\sqrt{\gamma}=\sqrt{A(t,x)} x^2\sin\theta$. For the ansatz above, $F_{x\theta}=F_{\theta\phi}=F_{\phi x}=0$, so $B^i=0$.
+## Basic Usage
 
-In the nonrelativistic limit this branch reduces to the radial-vector SP equation, not to the scalar SP equation.
-
-## Units
-
-The dimensionless coordinates are
-
-$$
-x=\mu r_{\mathrm{phys}}, \qquad t=\mu t_{\mathrm{phys}}.
-$$
-
-Here $\mu$ is the boson mass, $\omega_{\mathrm{phys}}=\mu\omega$, and $G=c=\hbar=1$.
-
-The physical Klein-Gordon field is $\Phi$. Internally, the scalar constructor uses the rescaled field $\widehat{\Phi}\equiv\sqrt{8\pi} \Phi$.
-
-The binding parameter is
-
-$$
-\epsilon=\sqrt{1-\omega^2}.
-$$
-
-## Metric
-
-Both constructors use polar-areal gauge,
-
-$$
-ds^2=-\alpha(t,x)^2dt^2+a(t,x)^2dx^2+x^2d\Omega^2 .
-$$
-
-The numerical metric variables are
-
-$$
-A(t,x)=a(t,x)^2, \qquad C(t,x)=\left(\frac{a(t,x)}{\alpha(t,x)}\right)^2 .
-$$
-
-Therefore
-
-$$
-a=\sqrt{A}, \qquad \alpha=\sqrt{\frac{A}{C}}, \qquad g_{00}=-\alpha^2=-\frac{A}{C}.
-$$
-
-The ADM mass function is
-
-$$
-M(t,x)=\frac{x}{2}\left(1-\frac{1}{A(t,x)}\right),
-$$
-
-The code also uses the enclosed-mass notation built from $A_0$,
-
-$$
-M({<}x)=\frac{x}{2}\left(1-\frac{1}{A_0(x)}\right).
-$$
-
-## Spherical Poisson-Gauge Convention
-
-Some scalar metric-potential diagnostics compare the polar-areal solutions to a local weak-field estimate after a spherical coordinate transformation. The usual Poisson gauge is a linear perturbation-theory metric,
-
-$$
-ds^2=-(1+2\Psi)d\tau^2+(1-2\Phi_{\mathrm{metric}})\delta_{ij}dX^i dX^j .
-$$
-
-For a spherical solution, the corresponding non-perturbative construction is an isotropic, Poisson-like gauge. Starting from
-
-$$
-ds^2=-\frac{A}{C}dt^2+A dx^2+x^2d\Omega^2,\quad d\Omega^2=d\theta^2+\sin^2\theta d\phi^2,
-$$
-
-define
-
-$$
-t=\tau+T(\tau,R),\qquad x=R+L(\tau,R),
-$$
-
-and impose the spherical Poisson-like coordinate conditions
-
-$$
-(g^{\mathrm{PG}})_{\tau R}=0,\qquad
-(g^{\mathrm{PG}})_{RR}=\frac{(g^{\mathrm{PG}})_{\theta\theta}}{R^2}\equiv \chi(\tau,R),
-\qquad
-(g^{\mathrm{PG}})_{\phi\phi}=\chi(\tau,R)R^2\sin^2\theta .
-$$
-
-The transformed line element is
-
-$$
-ds^2=(g^{\mathrm{PG}})_{\tau\tau}d\tau^2+\chi(\tau,R)[dR^2+R^2(d\theta^2+\sin^2\theta d\phi^2)],\qquad (g^{\mathrm{PG}})_{\tau\tau}<0.
-$$
-
-These are exact defining conditions. They become the usual Cartesian Poisson gauge only after expanding around flat space. In that expansion,
-
-$$
-(g^{\mathrm{PG}})_{\tau\tau}=-(1+2\Psi+\cdots),\qquad \chi=1-2\Phi_{\mathrm{metric}}+\cdots .
-$$
-
-For any periodic quantity $Q(\tau,R)$, write the Fourier series at fixed $R$ as
-
-$$
-Q(\tau,R)=Q_0(R)+\sum_{n\ge1}\left[Q_{n,c}(R)\cos(n\omega\tau)+Q_{n,s}(R)\sin(n\omega\tau)\right].
-$$
-
-The cosine coefficient at frequency $2\omega$ is
-
-$$
-[Q]_{2\omega}\equiv Q_{2,c}(R)=\frac{\omega}{\pi}\int_{\tau_0}^{\tau_0+2\pi/\omega}Q(\tau,R)\cos(2\omega\tau) d\tau .
-$$
-
-For an exactly transformed solution, the corresponding cosine amplitudes define the potentials:
-
-$$
--\Psi_2^{\mathrm{num}}=\frac{1}{2}[(g^{\mathrm{PG}})_{\tau\tau}+1]_{2\omega},
-$$
-
-$$
-\Phi_2^{\mathrm{num}}=-\frac{1}{2}[\chi-1]_{2\omega}.
-$$
-
-For the scalar oscillaton, the transformed scalar fundamental mode is the cosine coefficient of the rescaled field at frequency $\omega$,
-
-$$
-\phi_{1,\mathrm{PG}}(R)=\frac{\omega}{\pi}\int_{\tau_0}^{\tau_0+2\pi/\omega}
-\widehat{\Phi}(t(\tau,R),x(\tau,R))\cos(\omega\tau) d\tau .
-$$
-
-### Weak-field overlap used by the scalar local-estimate example
-
-The example <code>examples/compare_scalar_local_estimate.py</code> uses a weak-field overlap of the spherical conditions above rather than a full time-dependent coordinate integration. The static part first maps the areal radius to the isotropic radius from `A0`, and the oscillating coordinate shifts are solved on the original areal-radius grid.
-
-$$
-L(\tau,R)=L(x)\cos(2\omega\tau),\qquad T(\tau,R)=S(x)\sin(2\omega\tau).
-$$
-
-Primes in the following equations denote derivatives with respect to the areal coordinate.  The finite-domain overlap solve uses zero shift amplitudes at the outer edge of the computed profile.
-
-$$
-\frac{dL}{dx}=\left(\frac{1}{x}-\frac{A_0'}{2A_0}\right)L-\frac{A_2}{2A_0},\qquad
-\frac{dS}{dx}=-2\omega C_0L.
-$$
-
-For the static comparison,
-
-$$
-B_0=\frac{A_0}{C_0},\qquad B_2=\frac{A_2}{C_0}-\frac{A_0C_2}{C_0^2},
-$$
-
-$$
-(g^{\mathrm{PG}})_{\tau\tau,0}=-B_0,\qquad
-\chi_0=\left(\frac{x}{R}\right)^2,\qquad
--\Psi_0^{\mathrm{PG}}=\frac{1-B_0}{2},\qquad
--\Phi_0^{\mathrm{PG}}=\frac{\chi_0-1}{2}.
-$$
-
-Static curves use the superscript $\mathrm{PG}$. Oscillating amplitudes from the weak-field overlap use the superscript $\mathrm{overlap}$.
-
-The overlap amplitudes plotted in the local-estimate example are given by the next two equations.
-
-$$
-h_{00,2}^{\mathrm{overlap}}=-(B_2+LB_0')-4\omega B_0S,\qquad
-\chi_2^{\mathrm{overlap}}=\frac{2xL}{R^2},
-$$
-
-$$
--\Psi_2^{\mathrm{overlap}}=\frac{1}{2}h_{00,2}^{\mathrm{overlap}},\qquad
-\Phi_2^{\mathrm{overlap}}=-\frac{1}{2}\chi_2^{\mathrm{overlap}}.
-$$
-
-The scalar coefficient at the same order is
-
-$$
-\phi_{1,\mathrm{PG}}^{\mathrm{overlap}}=\phi_1+\frac{1}{2}L\phi_1'-\frac{1}{2}\omega S\phi_1.
-$$
-
-### Local estimate in the scalar case
-
-At fixed $R$, the local estimate neglects spatial gradients over one Compton period and keeps only the leading real-scalar oscillator,
-
-$$
-\widehat{\Phi}(\tau,R)=\sqrt{8\pi} \Phi(\tau,R)\simeq \phi_{1,\mathrm{PG}}(R)\cos(\omega\tau).
-$$
-
-Here $\tau$ is the dimensionless Poisson-gauge time, $\Phi$ is the physical Klein-Gordon field, and $\partial_\tau\Phi$ is the derivative with respect to $\tau$. In the nonrelativistic limit $\omega=1+O(\epsilon^2)$, the local density and pressure are
-
-$$
-\varrho_{\mathrm{loc}}=\frac{\mu^2}{2}\left\langle(\partial_\tau\Phi)^2+\Phi^2\right\rangle_\tau=\frac{\mu^2\phi_{1,\mathrm{PG}}^2}{16\pi}+O(\epsilon^2\mu^2\phi_{1,\mathrm{PG}}^2),
-$$
-
-$$
-p_{\mathrm{loc}}(\tau,R)=p_{2,\mathrm{loc}}(R)\cos(2\omega\tau)+\cdots,\qquad p_{2,\mathrm{loc}}=-\frac{\mu^2\phi_{1,\mathrm{PG}}^2}{16\pi}+O(\epsilon^2\mu^2\phi_{1,\mathrm{PG}}^2).
-$$
-
-In the zero-gradient local limit, the spatial-trace part of the linear Einstein equations in these units is
-
-$$
-\partial_\tau^2\Phi_{\mathrm{metric}}=\frac{4\pi}{\mu^2}p_{\mathrm{loc}}.
-$$
-
-Projecting this equation onto $\cos(2\omega\tau)$ gives
-
-$$
--4\omega^2\Phi_2^{\mathrm{local}}=\frac{4\pi}{\mu^2}p_{2,\mathrm{loc}},
-$$
-
-and therefore
-
-$$
-\Phi_2^{\mathrm{local}}=\frac{\phi_{1,\mathrm{PG}}^2}{16}+O(\epsilon^2\phi_{1,\mathrm{PG}}^2).
-$$
-
-One also finds $\Psi_2^{\mathrm{local}}\approx-\Phi_2^{\mathrm{local}}$ (e.g., by directly solving the linearized Einstein equation with a scalar plane-wave source, and taking the long-wavelength limit).
-
-The equivalent cosmological-perturbation statement is obtained by writing the same local homogeneous mode as
-
-$$
-ds^2=a_{\mathrm{loc}}(\tau,R)^2(-d\tau^2+d\mathbf X^2),\qquad a_{\mathrm{loc}}=1+s_2(R)\cos(2\omega\tau).
-$$
-
-The linear acceleration equation, $\partial_\tau^2a_{\mathrm{loc}}/a_{\mathrm{loc}}=-(4\pi/3\mu^2)(\varrho_{\mathrm{loc}}+3p_{\mathrm{loc}})$, gives
-
-$$
-s_2=-\frac{\phi_{1,\mathrm{PG}}^2}{16}+O(\epsilon^2\phi_{1,\mathrm{PG}}^2).
-$$
-
-Comparing $a_{\mathrm{loc}}^2=1+2s_2\cos(2\omega\tau)$ with $ds^2=-(1+2\Psi)d\tau^2+(1-2\Phi_{\mathrm{metric}})d\mathbf X^2$ gives $\Psi_2=s_2$ and $\Phi_2=-s_2$. The local real-scalar estimate and the local scale-factor-oscillation result are the same leading-order statement:
-
-$$
--\Psi_2^{\mathrm{local}}=\Phi_2^{\mathrm{local}}=\frac{\phi_{1,\mathrm{PG}}^2}{16}.
-$$
-
-The density relation is
-
-$$
-\phi_{1,\mathrm{PG}}^2=16\pi\frac{\varrho_{\mathrm{loc}}}{\mu^2}.
-$$
-
-With the covariant Poisson-like gauge component,
-
-$$
-h_{00}=(g^{\mathrm{PG}})_{\tau\tau}+1=-2\Psi+\cdots,
-$$
-
-so
-
-$$
-h_{00,2}^{\mathrm{local}}=\phi_{1,\mathrm{PG}}^2/8.
-$$
-
-The plotted local estimate for $-\Psi_2$ and $\Phi_2$ is $\phi_{1,\mathrm{PG}}^2/16$.
-
-The natural scaled radius for this transformed comparison is
-
-$$
-\tilde\rho=\epsilon R,\qquad \epsilon=\sqrt{1-\omega^2}.
-$$
-
-In the weak scalar SP limit, $\epsilon=\kappa\sqrt{V_\infty}+O(\kappa^3)$ and $R\simeq x$, so $\tilde\rho=\sqrt{V_\infty} \kappa x+O(\kappa^3x)$.
-
-## Scalar Field
-
-The constructor expands the fields as
-
-$$
-\widehat{\Phi}(t,x)=\sum_{\substack{j\ge 1\\ j\ \mathrm{odd}}}\phi_j(x)\cos(j\omega t),
-$$
-
-$$
-A(t,x)=\sum_{\substack{j\ge 0\\ j\ \mathrm{even}}}A_j(x)\cos(j\omega t), \qquad C(t,x)=\sum_{\substack{j\ge 0\\ j\ \mathrm{even}}}C_j(x)\cos(j\omega t).
-$$
-
-The scalar central input parameter in the API is `phi1_center`, the value of the first scalar Fourier coefficient at the origin.
-
-For weak scalar oscillatons the constructor uses the scalar SP ground state as the initial guess.
-
-## Vector Field
-
-The massive vector field is
-
-$$
-X_\mu dx^\mu = U(t,x) dt+W(t,x) dx,
-$$
-
-with
-
-$$
-F_{tx}=\dot W-U', \qquad E=\frac{F_{tx}}{\alpha a}.
-$$
-
-The first-order Proca relations used by the constructor are
-
-$$
-(x^2E)'=-x^2\sqrt{C} U,
-$$
-
-$$
-\dot E=-\frac{W}{\sqrt{C}}, \qquad W=-\sqrt{C} \dot E,
-$$
-
-$$
-U'=-\partial_t\left(\sqrt{C} \dot E\right)-\frac{AE}{\sqrt{C}}.
-$$
-
-The Fourier ansatz is
-
-$$
-U(t,x)=\sum_{\substack{j\ge 1\\ j\ \mathrm{odd}}}u_j(x)\cos(j\omega t), \qquad E(t,x)=\sum_{\substack{j\ge 1\\ j\ \mathrm{odd}}}e_j(x)\cos(j\omega t),
-$$
-
-$$
-W(t,x)=\sum_{\substack{j\ge 1\\ j\ \mathrm{odd}}}w_j(x)\sin(j\omega t),
-$$
-
-$$
-A(t,x)=\sum_{\substack{j\ge 0\\ j\ \mathrm{even}}}A_j(x)\cos(j\omega t), \qquad C(t,x)=\sum_{\substack{j\ge 0\\ j\ \mathrm{even}}}C_j(x)\cos(j\omega t).
-$$
-
-The projected Einstein-Proca system is
-
-$$
-\begin{aligned}
-A'&=\frac{A(1-A)}{x}+\frac{Ax}{2}\left(AE^2+CU^2+C\dot{E}^{2}\right),\\
-C'&=\frac{2C}{x}\left(1-A+\frac{x^2AE^2}{2}\right),\\
-E'&=-\frac{2E}{x}-\sqrt{C} U,\\
-U'&=-\partial_t\left(\sqrt{C} \dot E\right)-\frac{AE}{\sqrt{C}},\\
-\dot A&=-xA\sqrt{C} U\dot E .
-\end{aligned}
-$$
-
-The vector central input parameter in the API is `u1_center`, the value of the first vector Fourier coefficient at the origin.
-
-## Boundary Conditions
-
-The Fourier BVP is solved on a finite interval $x_{\min}\le x\le x_{\max}$. The solvers use `x_min=1.0e-4`, while `x_max` is user-controlled. The frequency `omega` is solved as an eigenvalue. The retained matter modes are odd and the retained metric modes are even:
-
-$$
-\mathcal J_{\mathrm{m}}=\{j\in\mathbb N:\ j\ \mathrm{odd},\ 1\le j\le j_{\max}\},
-\qquad
-\mathcal J_{\mathrm{g}}=\{j\in\mathbb N_0:\ j\ \mathrm{even},\ 0\le j\le j_{\max}\}.
-$$
-
-For the scalar constructor, let $\phi_{1,c}$ denote the input `phi1_center`. The inner boundary conditions are
-
-$$
-\begin{aligned}
-\phi_1(x_{\min})&=\phi_{1,c},\\
-\phi_j'(x_{\min})&=0\qquad (j\in\mathcal J_{\mathrm{m}}),\\
-A_0(x_{\min})&=1.
-\end{aligned}
-$$
-
-The scalar outer boundary conditions are
-
-$$
-\begin{aligned}
-\phi_j(x_{\max})&=0\qquad (j\in\mathcal J_{\mathrm{m}}),\\
-C_0(x_{\max})&=A_0(x_{\max})^2,\\
-C_j(x_{\max})&=0\qquad (j\in\mathcal J_{\mathrm{g}},\ j\ge2).
-\end{aligned}
-$$
-
-For the Proca constructor, let $u_{1,c}$ denote the input `u1_center`. The inner boundary conditions are
-
-$$
-\begin{aligned}
-u_1(x_{\min})&=u_{1,c},\\
-A_0(x_{\min})&=1,\\
-e_j(x_{\min})&=-\frac{x_{\min}}{3} [\sqrt{C} U]_j(x_{\min})\qquad (j\in\mathcal J_{\mathrm{m}}).
-\end{aligned}
-$$
-
-Here $[\sqrt{C} U]_j$ is the cosine Fourier coefficient of $\sqrt{C(t,x_{\min})} U(t,x_{\min})$ at odd matter mode $j$. It enforces the regular-origin Gauss-law condition for the radial electric coefficients.
-
-The Proca outer matter condition is applied mode by mode for $j\in\mathcal J_{\mathrm{m}}$. For $j\omega<1$, define
-
-$$
-\gamma_j=\sqrt{1-j^2\omega^2}.
-$$
-
-The outer matter condition is
-
-$$
-\begin{cases}
-\gamma_j^2 e_j(x_{\max})-\left(\gamma_j+\dfrac{1}{x_{\max}}\right)u_j(x_{\max})=0, & j\omega<1,\\
-u_j(x_{\max})=0, & j\omega\ge1.
-\end{cases}
-$$
-
-The first line is the finite-radius Yukawa Robin condition obtained from $u_j\propto e^{-\gamma_j x}/x$ and the asymptotic linear Proca relation $u_j'=-\gamma_j^2 e_j$. The second line is the finite-domain closure used by this code when the retained mode does not have a Yukawa decay constant. The code does not impose an outgoing-wave condition.
-
-The Proca metric outer boundary conditions are the same as in the scalar constructor,
-
-$$
-\begin{aligned}
-C_0(x_{\max})&=A_0(x_{\max})^2,\\
-C_j(x_{\max})&=0\qquad (j\in\mathcal J_{\mathrm{g}},\ j\ge2).
-\end{aligned}
-$$
-
-The inner conditions enforce regularity at the origin in polar-areal variables. The metric outer conditions set the oscillating metric modes to zero at the boundary and use $C_0=A_0^2$ as the finite-radius Schwarzschild/asymptotic time-normalization condition. The matter outer conditions are finite-domain closure conditions for the Fourier BVP; they are not time-evolution radiation boundary conditions.
-
-Basic numerical checks are: `profile.metadata["success"]` should be true, `profile.metadata["max_rms_residual"]` should be comparable to the requested `tol`, the outer tail of `profile.mass_profile` should be nearly flat, and the plotted profiles should be stable when `x_max`, `n_grid`, and the Fourier truncation are increased. The comparison example prints `scalar_tail_rel_std` and `proca_tail_rel_std`, which are the relative standard deviations of the outer mass tail.
-
-## Nonrelativistic References
-
-The scalar SP and radial-vector SP solutions in the nonrelativistic approximation give the corresponding $\{A_0(x),C_0(x),M({<}x)\}$ profiles.
-
-Start from the nonrelativistic real-scalar ansatz
-
-$$
-\Phi=\frac{1}{\sqrt{2\mu}}\left(\psi e^{-i\mu t_{\mathrm{phys}}}+\psi^*e^{i\mu t_{\mathrm{phys}}}\right),
-\qquad
-\psi=f(r)e^{-i\mathcal{E}t_{\mathrm{phys}}}.
-$$
-
-Introducing
-
-$$
-x=\mu r,\qquad
-F(x)=\sqrt{\frac{8\pi}{\mu}} f(r),
-\qquad
-V(x)=2\left(\Phi_N-\frac{\mathcal{E}}{\mu}\right),
-$$
-
-the Schrodinger-Poisson (SP) equation ($i\partial_{t_{\mathrm{phys}}}\psi=-\frac{\nabla^2\psi}{2\mu}+\mu\Phi_N\psi$, $\nabla^2\Phi_N=4\pi\mu|\psi|^2$) reduces to
-
-$$
-\partial_x^2F+\frac{2}{x}\partial_xF=VF,
-\qquad
-\partial_x^2V+\frac{2}{x}\partial_xV=F^2.
-$$
-
-The scaling symmetry can be introduced afterwards:
-
-$$
-F_\kappa(x)=\kappa^2F_1(\kappa x),
-\qquad
-V_\kappa(x)=\kappa^2V_1(\kappa x),
-$$
-
-With $F_1(0)=1$, this gives $F_\kappa(0)=\kappa^2$. The ansatz above gives $\Phi=\sqrt{2/\mu} f\cos\left[(\mu+\mathcal{E})t_{\mathrm{phys}}\right]$, so $\widehat{\Phi}_1=\sqrt{8\pi}\sqrt{2/\mu} f$, while $F_\kappa=\sqrt{8\pi/\mu} f$, so the rescaled-field Fourier coefficient is $\phi_1=\sqrt{2} F_\kappa$. With $y=\kappa x$, this gives $F_1(y)=\phi_1(y/\kappa)/(\sqrt{2} \kappa^2)$. The energy level is $\mathcal{E}/\mu=-\frac{1}{2}\kappa^2V_1(\infty)$, or $\omega=(\mu+\mathcal{E})/\mu=1-\frac{1}{2}\kappa^2V_1(\infty)$.
-
-For the Proca case, the SP equation is
-
-$$
-i\partial_{t_{\mathrm{phys}}}\vec\psi=-\frac{\nabla^2\vec\psi}{2\mu}+\mu\Phi_N\vec\psi,\quad \nabla^2\Phi_N=4\pi\mu|\vec \psi|^2.
-$$
-
-Use the radial spherical sector
-
-$$
-\vec\psi=f(r)e^{-i\mathcal{E}t_{\mathrm{phys}}}\vec e_r.
-$$
-
-Using
-
-$$
-\nabla^2\left[f(r)\vec e_r\right]=\left(\partial_r^2f+\frac{2}{r}\partial_rf-\frac{2}{r^2}f\right)\vec e_r.
-$$
-
-the SP equation reads
-
-$$
-\partial_r^2f+\frac{2}{r}\partial_rf-\frac{2}{r^2}f=2\mu(\mu\Phi_N-\mathcal{E})f.
-$$
-
-Using the same dimensionless definitions $x=\mu r$, $F=\sqrt{8\pi/\mu} f$, and $V=2(\Phi_N-\mathcal{E}/\mu)$ gives
-
-$$
-\partial_x^2F+\frac{2}{x}\partial_xF-\frac{2}{x^2}F=VF,
-\qquad
-\partial_x^2V+\frac{2}{x}\partial_xV=F^2.
-$$
-
-The extra $-2F/x^2$ term gives the radial-vector SP equation. Regularity at the origin requires $F(0)=0$, and the scaling freedom is fixed here by choosing $\partial_xF(0)=1$:
-
-$$
-F_\lambda(x)=\lambda^2F_1(\lambda x),
-\qquad
-V_\lambda(x)=\lambda^2V_1(\lambda x).
-$$
-
-Below we denote $F=F_1$, $V=V_1$, and $V_\infty=V_1(\infty)$.
-
-For the scalar branch, define the scaled radius by
-
-$$
-y=\kappa x
-$$
-
-and take the weak-field limit $\kappa\to0$ with $y$ fixed. The scalar SP wavefunction $F$ is the rescaled first scalar Fourier coefficient,
-
-$$
-F(y)=\lim_{\kappa\to0}
-\frac{\phi_1(y/\kappa)}{\sqrt{2} \kappa^2}.
-$$
-
-The scalar SP potential $V$ is the effective potential including the frequency eigenvalue shift,
-
-$$
-V_\infty=\lim_{\kappa\to0}\frac{1-\omega^2}{\kappa^2},
-\qquad
-V(y)=V_\infty-\lim_{\kappa\to0}
-\frac{C_0(y/\kappa)-A_0(y/\kappa)}{\kappa^2}.
-$$
-
-Equivalently, if $\mathcal V_\kappa(x)=\kappa^2V(\kappa x)$ and primes on $\mathcal V_\kappa$ denote $d/dx$, the weak-field metric profiles obey
-
-$$
-A_0(x)=1+x\mathcal V_\kappa'(x)+O(\kappa^4),
-$$
-
-$$
-C_0(x)=1+x\mathcal V_\kappa'(x)+\kappa^2V_\infty-\mathcal V_\kappa(x)+O(\kappa^4),
-$$
-
-$$
-M({<}x)=\frac{x^2}{2}\mathcal V_\kappa'(x)+O(\kappa^3).
-$$
-
-With these definitions, the scalar SP ground state solves
-
-$$
-\partial_y^2F+\frac{2}{y}\partial_yF=VF, \qquad \partial_y^2V+\frac{2}{y}\partial_yV=F^2.
-$$
-
-The inverse relation for the relativistic scalar profile is
-
-$$
-\phi_1(x)=\sqrt{2} \kappa^2F(\kappa x)+O(\kappa^4).
-$$
-
-The weak-field frequency and total mass scale as
-
-$$
-\omega=1-\frac{1}{2}\kappa^2V_\infty+O(\kappa^4),
-\qquad
-\epsilon=\kappa\sqrt{V_\infty}+O(\kappa^3),
-$$
-
-$$
-\mu M_{\mathrm{ADM}}=\kappa M_{\mathrm{SP}}+O(\kappa^3).
-$$
-
-The scalar SP mass convention is
-
-$$
-M_{\mathrm{SP}}=\frac{1}{2}\int_0^\infty y^2F(y)^2 dy.
-$$
-
-For the radial-vector branch, define the scaled radius by
-
-$$
-y=\lambda x
-$$
-
-and take the weak-field limit $\lambda\to0$ with $y$ fixed. The radial-vector SP wavefunction $F$ is defined from the first Fourier coefficient of the radial electric field,
-
-$$
-F(y)=-\lim_{\lambda\to0}\frac{e_1(y/\lambda)}{\lambda^2}.
-$$
-
-The minus sign is the code convention for positive `u1_center`. The first Proca potential coefficient is then fixed at leading order by the flat-space Gauss relation,
-
-$$
-u_1(x)=\lambda^3
-\left[
-\partial_yF(\lambda x)+\frac{2F(\lambda x)}{\lambda x}
-\right]+O(\lambda^5).
-$$
-
-For the normalization $\partial_yF(0)=1$, $u_1(0)=3\lambda^3+O(\lambda^5)$. The radial-vector SP potential is
-
-$$
-V_\infty=\lim_{\lambda\to0}\frac{1-\omega^2}{\lambda^2},
-\qquad
-V(y)=V_\infty-\lim_{\lambda\to0}
-\frac{C_0(y/\lambda)-A_0(y/\lambda)}{\lambda^2}.
-$$
-
-The radial-vector SP ground state solves
-
-$$
-\partial_y^2F+\frac{2}{y}\partial_yF-\frac{2}{y^2}F=VF, \qquad \partial_y^2V+\frac{2}{y}\partial_yV=F^2.
-$$
-
-The total mass and binding scale as
-
-$$
-\mu M_{\mathrm{ADM}}=\lambda M_{\mathrm{SP}}+O(\lambda^3),
-\qquad
-\epsilon=\lambda\sqrt{V_\infty}+O(\lambda^3).
-$$
-
-## Main Parameters
-
-| Name | Meaning |
-| --- | --- |
-| `target_mass` | Target dimensionless ADM mass $\mu M_{\mathrm{ADM}}$. |
-| `omega` | Dimensionless eigenfrequency $\omega=\omega_{\mathrm{phys}}/\mu$ stored by the profile object. |
-| `epsilon` | Binding parameter returned by `epsilon_from_omega`; mathematically $\epsilon=\sqrt{1-\omega^2}$. |
-| `jmax` | Largest retained Fourier index. Matter modes are odd and metric modes are even. |
-| `n_grid` | Number of radial collocation points. |
-| `n_time` | Number of Fourier phase collocation points. |
-| `tol` | Boundary-value solver tolerance. |
-| `mass_tol` | Relative tolerance used by the mass-tuning wrapper. |
-| `x_max` | Outer radial boundary in dimensionless radius $x$. |
-| `rho` | Scaled plotting radius. The scalar/vector/SP comparison uses $\rho=\kappa x$; the Poisson-gauge local-estimate comparison uses $\tilde\rho=\epsilon R$. |
-| `A0`, `C0` | Code arrays storing $A_0$ and $C_0$. |
-| `A2`, `C2` | Code arrays storing the second Fourier modes of `A` and `C`. |
-| `M0` | Code array storing $M({<}x)=x(1-1/A_0)/2$. |
-| `phi1_center` | Scalar central amplitude used as the scalar BVP input. |
-| `u1_center` | Vector central amplitude used as the vector BVP input. |
-
-## Function Usage
+### Full Profiles
 
 ```python
 from oscillaton_builders import (
     construct_scalar_oscillaton,
     construct_vector_oscillaton,
-    epsilon_from_omega,
-    zero_mode_metric_arrays,
 )
 
-target_mass = 2.0e-3
+scalar = construct_scalar_oscillaton(target_mass=0.2)
+proca = construct_vector_oscillaton(target_mass=0.2)
 
-scalar = construct_scalar_oscillaton(target_mass)
-vector = construct_vector_oscillaton(target_mass)
-
-print(scalar.mass, scalar.omega, epsilon_from_omega(scalar.omega))
-print(vector.mass, vector.omega, epsilon_from_omega(vector.omega))
+print(scalar.mass, scalar.omega)
+print(proca.mass, proca.omega)
 
 scalar_initial_data = scalar.initial_data()
-vector_initial_data = vector.initial_data()
-
-scalar_metric = zero_mode_metric_arrays(scalar, scalar.x)
-vector_metric = zero_mode_metric_arrays(vector, vector.x)
+proca_initial_data = proca.initial_data()
 ```
 
-Profile objects expose `x`, `omega`, `mass`, `A0`, `C0`, `mass_profile`, `evaluate(theta)`, and `initial_data()`.
+The returned profile objects provide `x`, `omega`, `mass`, `A0`, `C0`, `mass_profile`, `evaluate(theta)`, and `initial_data()`.
 
-For scalar profiles, `evaluate(theta)` returns `Phi`, `Phi_t`, `Phi_x`, `A`, `C`, `a`, and `alpha` (the returned `Phi` is the rescaled field $\widehat{\Phi}$).
-
-For vector profiles, `evaluate(theta)` returns `U`, `E`, `E_t`, `W`, `A`, `C`, `a`, and `alpha`.
-
-The SP references are available through
+### Nonrelativistic References
 
 ```python
-from oscillaton import solve_sp_ground_state
+from kg_oscillaton import solve_sp_ground_state
 from proca_oscillaton import solve_radial_proca_nr_ground_state
 
 scalar_sp = solve_sp_ground_state()
-radial_vector_sp = solve_radial_proca_nr_ground_state()
+proca_sp = solve_radial_proca_nr_ground_state()
 ```
 
-## Example Figures
+### Scalar Outgoing Radiation
 
-Regenerate all code figures with
+```python
+from kg_oscillaton import solve_scalar_outgoing_radiation
 
-```bash
-python examples/reproduce_code_figures.py
+radiation = solve_scalar_outgoing_radiation()
+print(radiation.omega, radiation.mass, radiation.c3_outgoing)
+print(radiation.mass_loss_rate)
 ```
 
-Run a single scalar/vector/SP comparison case with
+## Examples
 
-```bash
-python examples/compare_scalar_proca_sp_seeded.py \
-  --target-mass 6.0e-1 \
-  --output-csv figures/scalar_proca_radial_nr_same_mass_m6e-1.csv \
-  --plot figures/scalar_proca_radial_nr_same_mass_m6e-1.png
-```
+<p align="center"><img src="figures/scalar_proca_radial_nr_same_mass_m2e-3.png" alt="Scalar and Proca profiles at matched mass" width="900"></p>
 
-The plotted curves are `scalar` as blue solid, `vector` as red solid, `scalar SP` as black dashed, and `Proca radial SP` as black dash-dot. The fourth panel shows $A_2^{\mathrm{scalar}}$, $C_2^{\mathrm{scalar}}$, $A_2^{\mathrm{vector}}$, and $C_2^{\mathrm{vector}}$.
+<p align="center"><img src="figures/scalar_proca_radial_nr_same_mass_m2e-1.png" alt="Scalar and Proca profiles at matched mass" width="900"></p>
 
-| Figure | Target $\mu M_{\mathrm{ADM}}$ | Scalar mass | Vector mass | Scalar $\epsilon$ | Vector $\epsilon$ |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| `scalar_proca_radial_nr_same_mass_m2e-3.png` | `2.0e-3` | `1.999997391e-3` | `2.000000870e-3` | `1.141118690e-3` | `6.579194612e-4` |
-| `scalar_proca_radial_nr_same_mass_m2e-1.png` | `2.0e-1` | `2.000034037e-1` | `2.000036979e-1` | `1.160004602e-1` | `6.606791229e-2` |
-| `scalar_proca_radial_nr_same_mass_m6e-1.png` | `6.0e-1` | `6.000092822e-1` | `6.000148738e-1` | `4.695710613e-1` | `2.058889873e-1` |
+<p align="center"><img src="figures/scalar_proca_radial_nr_same_mass_m6e-1.png" alt="Scalar and Proca profiles at matched mass" width="900"></p>
 
-Run the scalar local-estimate comparison with
+<p align="center"><img src="figures/scalar_poisson_potentials_vs_local_m1e-1.png" alt="Scalar metric potentials and local estimate" width="900"></p>
 
-```bash
-python examples/compare_scalar_local_estimate.py \
-  --target-mass 1.0e-1 \
-  --output-csv figures/scalar_poisson_potentials_vs_local_m1e-1.csv \
-  --plot figures/scalar_poisson_potentials_vs_local_m1e-1.png
-```
+### Radiation Loss
 
-The first two panels compare the oscillating potential amplitudes with the local estimate. The third panel compares the static metric perturbations in the Poisson-like gauge with the SP Newtonian potential.
+Harmonic modes satisfying $j\omega_{\mathrm{phys}}>\mu$ propagate in the wave zone. For the configurations below, the leading outgoing-radiation channel is $j=3$, and its energy flux determines the mass-loss rate. The scalar outgoing-radiation amplitude is compared with [arXiv:1107.2791](https://arxiv.org/abs/1107.2791), while the Proca result is checked against the corresponding minimum-amplitude standing-wave construction.
+
+<p align="center"><img src="figures/scalar_outgoing_radiation_benchmark_omega086.png" alt="Scalar outgoing-radiation benchmark" width="900"></p>
+
+<p align="center"><img src="figures/proca_outgoing_radiation_m1.png" alt="Proca outgoing radiation" width="900"></p>

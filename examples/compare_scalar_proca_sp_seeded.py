@@ -11,7 +11,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from oscillaton import (
+from kg_oscillaton import (
     kappa_from_phi1_center,
     phi1_center_from_sp_mass,
     solve_profile_sp_seeded as solve_scalar_sp_seeded,
