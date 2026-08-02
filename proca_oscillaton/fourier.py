@@ -8,6 +8,7 @@ import numpy as np
 
 @dataclass(frozen=True)
 class ModeSet:
+
     matter: np.ndarray
     metric: np.ndarray
 
@@ -97,4 +98,3 @@ def spectral_dt(values: np.ndarray, omega: float) -> np.ndarray:
         1j * wave_numbers * np.fft.fft(values, axis=-1), axis=-1
     ).real
     return omega * derivative
-

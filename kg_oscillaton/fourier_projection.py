@@ -9,6 +9,7 @@ import numpy as np
 @dataclass(frozen=True)
 class ModeSet:
 
+
     scalar: np.ndarray
     metric: np.ndarray
 
@@ -317,4 +318,3 @@ def residual_fourier_odes(
 ) -> np.ndarray:
 
     return dy_dx - fourier_rhs_full(x, y, omega, jmax, n_time=n_time)
-

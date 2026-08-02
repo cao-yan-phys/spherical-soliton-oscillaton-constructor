@@ -18,6 +18,7 @@ from .fourier_projection import (
 
 @dataclass(frozen=True)
 class _RadiationModes:
+
     scalar: np.ndarray
     metric: np.ndarray
 
@@ -33,6 +34,7 @@ _RadiationModes.__doc__ = None
 
 @dataclass(frozen=True)
 class ScalarOutgoingRadiationResult:
+
 
     omega: float
     epsilon: float
@@ -527,6 +529,7 @@ def _standing_summary(solution, jmax: int) -> dict[str, float]:
 
 @dataclass(frozen=True)
 class _ComplexBackground:
+
     full_solution: object
     omega: float
     jmax: int

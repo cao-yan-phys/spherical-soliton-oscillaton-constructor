@@ -10,6 +10,7 @@ from .fourier import build_phase_grid, evaluate_modes
 
 @dataclass
 class ProcaOscillatonProfile:
+
     x: np.ndarray
     matter_modes: np.ndarray
     metric_modes: np.ndarray
@@ -73,4 +74,3 @@ class ProcaOscillatonProfile:
     def phase_grid(self, n_time: int = 96) -> np.ndarray:
         return build_phase_grid(n_time)
 ProcaOscillatonProfile.__doc__ = None
-

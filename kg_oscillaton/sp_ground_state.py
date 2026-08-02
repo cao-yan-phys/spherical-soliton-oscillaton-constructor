@@ -10,6 +10,7 @@ from scipy.integrate import solve_bvp
 @dataclass
 class SPGroundState:
 
+
     y: np.ndarray
     F: np.ndarray
     dF: np.ndarray

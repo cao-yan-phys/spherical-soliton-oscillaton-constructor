@@ -12,6 +12,7 @@ from .fourier_projection import evaluate_fourier_modes, mode_set
 @dataclass
 class OscillatonProfile:
 
+
     x: np.ndarray
     scalar_modes: np.ndarray
     metric_modes: np.ndarray
