@@ -1,6 +1,6 @@
 # Spherical Soliton & Oscillaton Constructor
 
-Numerical constructors for spherically symmetric oscillatons of real scalar and real Proca fields.
+Numerical constructors for spherically symmetric (Newtonian) solitons and (relativistic) oscillatons of real scalar and real Proca fields in Einstein gravity.
 
 <p align="center">
   <img src="figures/proca_g00_m6e-1.gif" alt="Time-dependent Proca oscillaton metric profile" width="420" style="border-radius:50%;">
