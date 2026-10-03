@@ -12,8 +12,8 @@ from .fourier_projection import (
     reconstruct_A_modes,
     reduced_state_size,
 )
-from .profiles import OscillatonProfile
-from .sp_ground_state import solve_sp_ground_state
+from .profiles import KGOscillatonProfile
+from .sp_ground_state import solve_kg_sp_ground_state
 
 
 SP_BASE_CLOUD_MASS = 1.734128080715
@@ -21,7 +21,7 @@ SP_BASE_CLOUD_MASS = 1.734128080715
 
 @lru_cache(maxsize=16)
 def _cached_sp_ground_state(y_max: float, n_grid: int, tol: float):
-    return solve_sp_ground_state(y_max=y_max, n_grid=n_grid, tol=tol)
+    return solve_kg_sp_ground_state(y_max=y_max, n_grid=n_grid, tol=tol)
 
 
 def _validate_solver_options(
@@ -66,12 +66,12 @@ def _initial_guess(jmax: int, x: np.ndarray, phi1_center: float) -> np.ndarray:
     y = np.zeros((reduced_state_size(jmax), x.size))
     radius = 4.0 + 8.0 / (1.0 + 10.0 * phi1_center)
 
-    for idx, mode in enumerate(modes.scalar):
+    for idx, mode in enumerate(modes.kg):
         amp = phi1_center if mode == 1 else ((-1.0) ** idx) * phi1_center * 0.03**idx
         y[idx] = amp * np.exp(-(x / radius) ** 2)
-        y[modes.n_scalar + idx] = y[idx] * (-2.0 * x / radius**2)
+        y[modes.n_kg + idx] = y[idx] * (-2.0 * x / radius**2)
 
-    A0_idx = 2 * modes.n_scalar
+    A0_idx = 2 * modes.n_kg
     y[A0_idx] = 1.0 + 0.15 * (x / radius) ** 2 * np.exp(-(x / (1.5 * radius)) ** 2)
     y[A0_idx, 0] = 1.0
 
@@ -129,10 +129,10 @@ def _sp_initial_guess(
     phi1 = np.sqrt(2.0) * kappa**2 * F
     dphi1 = np.sqrt(2.0) * kappa**3 * dF_dz
     y[0] = phi1
-    y[modes.n_scalar] = dphi1
+    y[modes.n_kg] = dphi1
 
     enclosed_over_x = x * dV_dx
-    A0_idx = 2 * modes.n_scalar
+    A0_idx = 2 * modes.n_kg
     y[A0_idx] = 1.0 + enclosed_over_x
 
     C_start = A0_idx + 1
@@ -151,37 +151,37 @@ def _sp_initial_guess(
     return y, omega, metadata
 
 
-def _expand_guess(previous: OscillatonProfile, jmax: int, x: np.ndarray) -> np.ndarray:
+def _expand_guess(previous: KGOscillatonProfile, jmax: int, x: np.ndarray) -> np.ndarray:
     old = mode_set(previous.jmax)
     new = mode_set(jmax)
     y = np.zeros((reduced_state_size(jmax), x.size))
 
     old_phi = np.vstack([previous.phi, previous.dphi])
-    for old_idx, mode in enumerate(old.scalar):
-        if mode in new.scalar:
-            new_idx = int(np.where(new.scalar == mode)[0][0])
+    for old_idx, mode in enumerate(old.kg):
+        if mode in new.kg:
+            new_idx = int(np.where(new.kg == mode)[0][0])
             y[new_idx] = np.interp(x, previous.x, old_phi[old_idx])
-            y[new.n_scalar + new_idx] = np.interp(
-                x, previous.x, old_phi[old.n_scalar + old_idx]
+            y[new.n_kg + new_idx] = np.interp(
+                x, previous.x, old_phi[old.n_kg + old_idx]
             )
 
-    y[2 * new.n_scalar] = np.interp(x, previous.x, previous.A0)
-    old_C_start = 2 * old.n_scalar + 1
+    y[2 * new.n_kg] = np.interp(x, previous.x, previous.A0)
+    old_C_start = 2 * old.n_kg + 1
     for old_idx, mode in enumerate(old.metric):
         if mode in new.metric:
             new_idx = int(np.where(new.metric == mode)[0][0])
-            y[2 * new.n_scalar + 1 + new_idx] = np.interp(
+            y[2 * new.n_kg + 1 + new_idx] = np.interp(
                 x, previous.x, previous.C[old_idx]
             )
 
     radius = 6.0
-    for idx, mode in enumerate(new.scalar):
-        if mode not in old.scalar:
+    for idx, mode in enumerate(new.kg):
+        if mode not in old.kg:
             y[idx] = 0.003 * ((-1.0) ** idx) * np.exp(-(x / radius) ** 2)
-            y[new.n_scalar + idx] = y[idx] * (-2.0 * x / radius**2)
+            y[new.n_kg + idx] = y[idx] * (-2.0 * x / radius**2)
     for idx, mode in enumerate(new.metric):
         if mode not in old.metric:
-            y[2 * new.n_scalar + 1 + idx] = (
+            y[2 * new.n_kg + 1 + idx] = (
                 0.001 * ((-1.0) ** idx) * np.exp(-(x / radius) ** 2)
             )
     return y
@@ -189,7 +189,7 @@ def _expand_guess(previous: OscillatonProfile, jmax: int, x: np.ndarray) -> np.n
 
 def _make_bc(jmax: int, phi1_center: float):
     modes = mode_set(jmax)
-    ns = modes.n_scalar
+    ns = modes.n_kg
 
     def bc(ya, yb, p):
         A0_outer = yb[2 * ns]
@@ -214,13 +214,13 @@ def _solve_single(
     n_grid: int,
     n_time: int,
     tol: float,
-    previous: OscillatonProfile | None,
+    previous: KGOscillatonProfile | None,
     initial_y_guess: np.ndarray | None = None,
     omega_guess: float | None = None,
     seed_metadata: dict | None = None,
     require_success: bool,
     verbose: int,
-) -> OscillatonProfile:
+) -> KGOscillatonProfile:
     x = np.linspace(1.0e-4, x_max, n_grid)
     if initial_y_guess is not None:
         y_guess = initial_y_guess
@@ -249,13 +249,13 @@ def _solve_single(
         verbose=verbose,
     )
     if require_success:
-        _raise_if_unsuccessful(solution, label="scalar oscillaton", jmax=jmax)
+        _raise_if_unsuccessful(solution, label="KG oscillaton", jmax=jmax)
 
     modes = mode_set(jmax)
     A_modes = reconstruct_A_modes(
         solution.x, solution.y, float(solution.p[0]), jmax, n_time=n_time
     )
-    ns = modes.n_scalar
+    ns = modes.n_kg
     C_start = 2 * ns + 1
     metadata = {
         "success": bool(solution.success),
@@ -266,9 +266,9 @@ def _solve_single(
     }
     if seed_metadata:
         metadata.update(seed_metadata)
-    return OscillatonProfile(
+    return KGOscillatonProfile(
         x=solution.x,
-        scalar_modes=modes.scalar,
+        kg_modes=modes.kg,
         metric_modes=modes.metric,
         phi=solution.y[:ns],
         dphi=solution.y[ns : 2 * ns],
@@ -290,10 +290,10 @@ def solve_profile(
     n_time: int = 128,
     tol: float = 1.0e-4,
     continuation: bool = True,
-    previous: OscillatonProfile | None = None,
+    previous: KGOscillatonProfile | None = None,
     require_success: bool = True,
     verbose: int = 0,
-) -> OscillatonProfile:
+) -> KGOscillatonProfile:
 
     if phi1_center <= 0:
         raise ValueError("phi1_center must be positive")
@@ -335,7 +335,7 @@ def solve_profile(
     return profile
 
 
-def solve_profile_sp_seeded(
+def solve_profile_seeded(
     phi1_center: float,
     jmax: int = 2,
     x_max: float | None = None,
@@ -347,7 +347,7 @@ def solve_profile_sp_seeded(
     sp_tol: float = 1.0e-6,
     require_success: bool = True,
     verbose: int = 0,
-) -> OscillatonProfile:
+) -> KGOscillatonProfile:
 
     if phi1_center <= 0:
         raise ValueError("phi1_center must be positive")
@@ -396,7 +396,7 @@ def solve_family(
     tol: float = 1.0e-4,
     require_success: bool = True,
     verbose: int = 0,
-) -> list[OscillatonProfile]:
+) -> list[KGOscillatonProfile]:
 
     _validate_solver_options(
         jmax=jmax,
@@ -405,7 +405,7 @@ def solve_family(
         n_time=n_time,
         tol=tol,
     )
-    profiles: list[OscillatonProfile] = []
+    profiles: list[KGOscillatonProfile] = []
     previous = None
     for value in phi1_values:
         profile = solve_profile(

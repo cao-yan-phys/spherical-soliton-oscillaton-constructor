@@ -8,7 +8,7 @@ from scipy.integrate import solve_bvp
 
 
 @dataclass
-class RadialProcaNRProfile:
+class ProcaSPGroundState:
 
 
     y: np.ndarray
@@ -49,13 +49,13 @@ class RadialProcaNRProfile:
         k = self.epsilon
         return float(self.dF[-1] + (k + 1.0 / y + 1.0 / (y * (k * y + 1.0))) * self.F[-1])
 
-    def scaled(self, scale: float) -> "RadialProcaNRProfile":
+    def scaled(self, scale: float) -> "ProcaSPGroundState":
         if scale <= 0.0:
             raise ValueError("scale must be positive")
         if np.isclose(scale, self.scale):
             return self
         ratio = scale / self.scale
-        return RadialProcaNRProfile(
+        return ProcaSPGroundState(
             y=self.y / ratio,
             F=ratio**2 * self.F,
             dF=ratio**3 * self.dF,
@@ -80,7 +80,7 @@ class RadialProcaNRProfile:
             "C0": C0,
             "M0": 0.5 * x**2 * dV_dx,
         }
-RadialProcaNRProfile.__doc__ = None
+ProcaSPGroundState.__doc__ = None
 
 
 def _rhs(y: np.ndarray, state: np.ndarray) -> np.ndarray:
@@ -96,7 +96,7 @@ def _rhs(y: np.ndarray, state: np.ndarray) -> np.ndarray:
     )
 
 
-def solve_radial_proca_nr_ground_state(
+def solve_proca_sp_ground_state(
     *,
     slope: float = 1.0,
     y_max: float = 50.0,
@@ -109,7 +109,7 @@ def solve_radial_proca_nr_ground_state(
     max_nodes: int | None = None,
     verbose: int = 0,
     raise_on_fail: bool = True,
-) -> RadialProcaNRProfile:
+) -> ProcaSPGroundState:
 
     if slope <= 0.0:
         raise ValueError("slope must be positive")
@@ -158,7 +158,7 @@ def solve_radial_proca_nr_ground_state(
         raise RuntimeError(solution.message)
 
     V0 = solution.y[2, 0] - slope**2 * y_min**4 / 20.0
-    profile = RadialProcaNRProfile(
+    profile = ProcaSPGroundState(
         y=np.r_[0.0, solution.x],
         F=np.r_[0.0, solution.y[0]],
         dF=np.r_[slope, solution.y[1]],

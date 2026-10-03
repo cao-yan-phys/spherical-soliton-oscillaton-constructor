@@ -11,13 +11,13 @@ from scipy.interpolate import CubicSpline
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from kg_oscillaton import (  # noqa: E402
+from kg_oscillaton import (
     kappa_from_phi1_center,
     phi1_center_from_sp_mass,
-    solve_sp_ground_state,
-    solve_profile_sp_seeded,
+    solve_kg_sp_ground_state,
+    solve_profile_seeded,
 )
-from oscillaton_builders import (  # noqa: E402
+from oscillaton_builders import (
     epsilon_from_omega,
     metric_mode,
     zero_mode_mass,
@@ -158,9 +158,9 @@ def construct_stable_poisson_overlap(
     chi_2 = 2.0 * x * L / R**2
     metric_phi_2 = -0.5 * chi_2
 
-    scalar_index = int(np.where(profile.scalar_modes == 1)[0][0])
-    phi1 = profile.phi[scalar_index]
-    dphi1 = profile.dphi[scalar_index]
+    kg_index = int(np.where(profile.kg_modes == 1)[0][0])
+    phi1 = profile.phi[kg_index]
+    dphi1 = profile.dphi[kg_index]
     phi1_pg = phi1 + 0.5 * L * dphi1 - 0.5 * profile.omega * S * phi1
 
     return {
@@ -180,10 +180,10 @@ def construct_stable_poisson_overlap(
     }
 
 
-def solve_scalar_profile(args):
+def solve_kg_profile(args):
     phi1_center = phi1_center_from_sp_mass(args.target_mass)
     kappa = kappa_from_phi1_center(phi1_center)
-    return solve_profile_sp_seeded(
+    return solve_profile_seeded(
         phi1_center,
         jmax=args.jmax,
         x_max=max(args.x_min, args.rho_max / kappa),
@@ -193,9 +193,9 @@ def solve_scalar_profile(args):
     )
 
 
-def scalar_sp_newtonian_potential(R: np.ndarray, kappa: float) -> np.ndarray:
+def kg_sp_newtonian_potential(R: np.ndarray, kappa: float) -> np.ndarray:
     y = kappa * R
-    sp = solve_sp_ground_state(
+    sp = solve_kg_sp_ground_state(
         y_max=max(40.0, float(y[-1])),
         n_grid=max(500, min(1800, int(25 * max(40.0, float(y[-1]))))),
         tol=1.0e-6,
@@ -221,16 +221,16 @@ def main() -> None:
     parser.add_argument(
         "--plot",
         type=Path,
-        default=Path("figures/scalar_poisson_potentials_vs_local_m1e-1.png"),
+        default=Path("figures/kg_poisson_potentials_vs_local_m1e-1.png"),
     )
     parser.add_argument(
         "--output-csv",
         type=Path,
-        default=Path("figures/scalar_poisson_potentials_vs_local_m1e-1.csv"),
+        default=Path("figures/kg_poisson_potentials_vs_local_m1e-1.csv"),
     )
     args = parser.parse_args()
 
-    profile = solve_scalar_profile(args)
+    profile = solve_kg_profile(args)
     phi1_center = phi1_center_from_sp_mass(args.target_mass)
     kappa = kappa_from_phi1_center(phi1_center)
     result = construct_stable_poisson_overlap(
@@ -243,7 +243,7 @@ def main() -> None:
     rho = epsilon * result["R"]
     minus_psi_2 = 0.5 * result["h00_2"]
     local_estimate = result["phi1_pg"] ** 2 / 16.0
-    minus_sp_newtonian = -scalar_sp_newtonian_potential(result["R"], kappa)
+    minus_sp_newtonian = -kg_sp_newtonian_potential(result["R"], kappa)
 
     data = np.column_stack(
         (
@@ -287,7 +287,7 @@ def main() -> None:
         & (minus_sp_newtonian > 0.0)
     )
 
-    plt.rcParams.update({"font.size": 12, "mathtext.fontset": "dejavusans"})
+    plt.rcParams.update({"font.size": 12})
     fig, axes = plt.subplots(1, 3, figsize=(17.2, 4.5), sharex=True)
 
     axes[0].plot(
@@ -303,7 +303,7 @@ def main() -> None:
         lw=2.0,
         color="k",
         ls="--",
-        label=r"$\phi_{1,\mathrm{PG}}^2/16$",
+        label="local approx.",
     )
     axes[0].set_yscale("log")
     axes[0].set_xlabel(r"$\tilde{\rho}=\epsilon R$")
@@ -324,7 +324,7 @@ def main() -> None:
         lw=2.0,
         color="k",
         ls="--",
-        label=r"$\phi_{1,\mathrm{PG}}^2/16$",
+        label="local approx.",
     )
     axes[1].set_yscale("log")
     axes[1].set_xlabel(r"$\tilde{\rho}=\epsilon R$")
@@ -352,7 +352,7 @@ def main() -> None:
         lw=2.0,
         color="k",
         ls="--",
-        label=r"$-\Phi_N^{\mathrm{SP}}$",
+        label="scalar SP",
     )
     axes[2].set_yscale("log")
     axes[2].set_xlabel(r"$\tilde{\rho}=\epsilon R$")
@@ -360,8 +360,8 @@ def main() -> None:
     axes[2].legend(fontsize=10)
 
     fig.suptitle(
-        rf"Scalar metric potentials in Poisson-like gauge, "
-        rf"$\mu M_{{\mathrm{{ADM}}}}={zero_mode_mass(profile):.9g}$"
+        "Scalar metric potentials in Poisson-like gauge, "
+        + rf"$\mu M_{{\mathrm{{ADM}}}} = {zero_mode_mass(profile):.9g}$"
     )
     fig.tight_layout()
     args.plot.parent.mkdir(parents=True, exist_ok=True)

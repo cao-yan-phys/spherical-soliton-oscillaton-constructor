@@ -333,7 +333,7 @@ def solve_profile(
     return profile
 
 
-def solve_profile_scaled_seeded(
+def solve_profile_seeded(
     u1_center: float,
     reference: ProcaOscillatonProfile,
     jmax: int | None = None,

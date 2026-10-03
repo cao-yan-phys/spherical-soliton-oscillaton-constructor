@@ -8,7 +8,7 @@ from scipy.integrate import solve_bvp
 
 
 @dataclass
-class SPGroundState:
+class KGSPGroundState:
 
 
     y: np.ndarray
@@ -63,14 +63,14 @@ class SPGroundState:
         signs = np.sign(self.F[mask])
         return int(np.count_nonzero(signs[1:] * signs[:-1] < 0))
 
-    def scaled(self, kappa: float) -> "SPGroundState":
+    def scaled(self, kappa: float) -> "KGSPGroundState":
 
         if kappa <= 0.0:
             raise ValueError("kappa must be positive")
         if np.isclose(kappa, self.kappa):
             return self
         ratio = kappa / self.kappa
-        return SPGroundState(
+        return KGSPGroundState(
             y=self.y / ratio,
             F=ratio**2 * self.F,
             dF=ratio**3 * self.dF,
@@ -84,7 +84,7 @@ class SPGroundState:
 
         N = self.enclosed_integral
         return np.column_stack((self.y, self.F, self.dF, self.V, self.dV, N, 0.5 * N))
-SPGroundState.__doc__ = None
+KGSPGroundState.__doc__ = None
 
 
 def _initial_guess(
@@ -116,7 +116,7 @@ def _rhs(y: np.ndarray, state: np.ndarray) -> np.ndarray:
     )
 
 
-def solve_sp_ground_state(
+def solve_kg_sp_ground_state(
     *,
     kappa: float = 1.0,
     y_max: float = 40.0,
@@ -129,7 +129,7 @@ def solve_sp_ground_state(
     max_nodes: int | None = None,
     verbose: int = 0,
     raise_on_fail: bool = True,
-) -> SPGroundState:
+) -> KGSPGroundState:
 
     if kappa <= 0.0:
         raise ValueError("kappa must be positive")
@@ -192,7 +192,7 @@ def solve_sp_ground_state(
         "y_max": float(y_max),
         "tol": float(tol),
     }
-    base = SPGroundState(
+    base = KGSPGroundState(
         y=y_sol,
         F=F_sol,
         dF=dF_sol,

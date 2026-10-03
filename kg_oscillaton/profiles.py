@@ -10,11 +10,11 @@ from .fourier_projection import evaluate_fourier_modes, mode_set
 
 
 @dataclass
-class OscillatonProfile:
+class KGOscillatonProfile:
 
 
     x: np.ndarray
-    scalar_modes: np.ndarray
+    kg_modes: np.ndarray
     metric_modes: np.ndarray
     phi: np.ndarray
     dphi: np.ndarray
@@ -28,15 +28,15 @@ class OscillatonProfile:
     def evaluate(self, theta: np.ndarray | float) -> dict[str, np.ndarray]:
 
         theta_arr = np.atleast_1d(np.asarray(theta, dtype=float))
-        Phi = evaluate_fourier_modes(self.scalar_modes, theta_arr, self.phi)
+        Phi = evaluate_fourier_modes(self.kg_modes, theta_arr, self.phi)
         Phi_t = evaluate_fourier_modes(
-            self.scalar_modes,
+            self.kg_modes,
             theta_arr,
             self.phi,
             omega=self.omega,
             time_derivative=1,
         )
-        Phi_x = evaluate_fourier_modes(self.scalar_modes, theta_arr, self.dphi)
+        Phi_x = evaluate_fourier_modes(self.kg_modes, theta_arr, self.dphi)
         A = evaluate_fourier_modes(self.metric_modes, theta_arr, self.A)
         C = evaluate_fourier_modes(self.metric_modes, theta_arr, self.C)
         a = np.sqrt(A)
@@ -83,7 +83,7 @@ class OscillatonProfile:
     @property
     def rmax(self) -> tuple[float, float]:
         return rmax_grr(self.x, self.initial_data()["A"])
-OscillatonProfile.__doc__ = None
+KGOscillatonProfile.__doc__ = None
 
 
 def empty_profile_like_grid(jmax: int, x: np.ndarray, phi1_center: float):
@@ -91,10 +91,10 @@ def empty_profile_like_grid(jmax: int, x: np.ndarray, phi1_center: float):
     modes = mode_set(jmax)
     return {
         "x": x,
-        "scalar_modes": modes.scalar,
+        "kg_modes": modes.kg,
         "metric_modes": modes.metric,
-        "phi": np.zeros((modes.n_scalar, x.size)),
-        "dphi": np.zeros((modes.n_scalar, x.size)),
+        "phi": np.zeros((modes.n_kg, x.size)),
+        "dphi": np.zeros((modes.n_kg, x.size)),
         "A": np.zeros((modes.n_metric, x.size)),
         "C": np.zeros((modes.n_metric, x.size)),
         "omega": np.nan,

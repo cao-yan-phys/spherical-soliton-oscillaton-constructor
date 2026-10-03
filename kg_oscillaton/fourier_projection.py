@@ -10,12 +10,12 @@ import numpy as np
 class ModeSet:
 
 
-    scalar: np.ndarray
+    kg: np.ndarray
     metric: np.ndarray
 
     @property
-    def n_scalar(self) -> int:
-        return int(self.scalar.size)
+    def n_kg(self) -> int:
+        return int(self.kg.size)
 
     @property
     def n_metric(self) -> int:
@@ -28,7 +28,7 @@ def mode_set(jmax: int) -> ModeSet:
     if jmax < 2:
         raise ValueError("jmax must be at least 2")
     return ModeSet(
-        scalar=np.arange(1, jmax + 1, 2, dtype=int),
+        kg=np.arange(1, jmax + 1, 2, dtype=int),
         metric=np.arange(0, jmax + 1, 2, dtype=int),
     )
 
@@ -36,13 +36,13 @@ def mode_set(jmax: int) -> ModeSet:
 def reduced_state_size(jmax: int) -> int:
 
     modes = mode_set(jmax)
-    return 2 * modes.n_scalar + 1 + modes.n_metric
+    return 2 * modes.n_kg + 1 + modes.n_metric
 
 
 def full_state_size(jmax: int) -> int:
 
     modes = mode_set(jmax)
-    return 2 * modes.n_scalar + 2 * modes.n_metric
+    return 2 * modes.n_kg + 2 * modes.n_metric
 
 
 def build_time_grid(n_time: int, omega: float = 1.0) -> tuple[np.ndarray, np.ndarray]:
@@ -113,7 +113,7 @@ def project_sin_coefficients(
 def unpack_reduced_state(y: np.ndarray, jmax: int):
 
     modes = mode_set(jmax)
-    ns = modes.n_scalar
+    ns = modes.n_kg
     phi = y[:ns]
     q = y[ns : 2 * ns]
     A0 = y[2 * ns]
@@ -124,7 +124,7 @@ def unpack_reduced_state(y: np.ndarray, jmax: int):
 def unpack_full_state(y: np.ndarray, jmax: int):
 
     modes = mode_set(jmax)
-    ns = modes.n_scalar
+    ns = modes.n_kg
     nm = modes.n_metric
     phi = y[:ns]
     q = y[ns : 2 * ns]
@@ -188,9 +188,9 @@ def reconstruct_A_modes(
     modes = mode_set(jmax)
     theta, _ = build_time_grid(n_time, omega)
     phi, q, A0, _ = unpack_reduced_state(y, jmax)
-    cos_s = evaluate_fourier_modes(modes.scalar, theta)
+    cos_s = evaluate_fourier_modes(modes.kg, theta)
     sin_t = evaluate_fourier_modes(
-        modes.scalar, theta, omega=omega, time_derivative=1
+        modes.kg, theta, omega=omega, time_derivative=1
     )
     Phi_t = phi.T @ sin_t
     Phi_x = q.T @ cos_s
@@ -212,14 +212,14 @@ def fourier_rhs_reduced(
     theta, _ = build_time_grid(n_time, omega)
     phi, q, A0, Ccoef = unpack_reduced_state(y, jmax)
 
-    cos_s = evaluate_fourier_modes(modes.scalar, theta)
+    cos_s = evaluate_fourier_modes(modes.kg, theta)
     Phi = phi.T @ cos_s
     Phi_x = q.T @ cos_s
     Phi_t = phi.T @ evaluate_fourier_modes(
-        modes.scalar, theta, omega=omega, time_derivative=1
+        modes.kg, theta, omega=omega, time_derivative=1
     )
     Phi_tt = phi.T @ evaluate_fourier_modes(
-        modes.scalar, theta, omega=omega, time_derivative=2
+        modes.kg, theta, omega=omega, time_derivative=2
     )
 
     Acoef = solve_metric_modes_from_momentum(
@@ -241,10 +241,10 @@ def fourier_rhs_reduced(
     Phi_xx += -Phi_x * (2.0 / xx - C_rhs / (2.0 * C)) + A * Phi
 
     dy = np.zeros_like(y)
-    ns = modes.n_scalar
+    ns = modes.n_kg
     dy[:ns] = q
     dy[ns : 2 * ns] = project_cos_coefficients(
-        Phi_xx, theta, modes.scalar
+        Phi_xx, theta, modes.kg
     )
     dy[2 * ns] = project_cos_coefficients(
         A_rhs, theta, np.array([0], dtype=int)
@@ -268,14 +268,14 @@ def fourier_rhs_full(
     theta, _ = build_time_grid(n_time, omega)
     phi, q, Acoef, Ccoef = unpack_full_state(y, jmax)
 
-    cos_s = evaluate_fourier_modes(modes.scalar, theta)
+    cos_s = evaluate_fourier_modes(modes.kg, theta)
     Phi = phi.T @ cos_s
     Phi_x = q.T @ cos_s
     Phi_t = phi.T @ evaluate_fourier_modes(
-        modes.scalar, theta, omega=omega, time_derivative=1
+        modes.kg, theta, omega=omega, time_derivative=1
     )
     Phi_tt = phi.T @ evaluate_fourier_modes(
-        modes.scalar, theta, omega=omega, time_derivative=2
+        modes.kg, theta, omega=omega, time_derivative=2
     )
     cos_m = evaluate_fourier_modes(modes.metric, theta)
     A = Acoef.T @ cos_m
@@ -292,11 +292,11 @@ def fourier_rhs_full(
     Phi_xx += -Phi_x * (2.0 / xx - C_rhs / (2.0 * C)) + A * Phi
 
     dy = np.zeros_like(y)
-    ns = modes.n_scalar
+    ns = modes.n_kg
     nm = modes.n_metric
     dy[:ns] = q
     dy[ns : 2 * ns] = project_cos_coefficients(
-        Phi_xx, theta, modes.scalar
+        Phi_xx, theta, modes.kg
     )
     dy[2 * ns : 2 * ns + nm] = project_cos_coefficients(
         A_rhs, theta, modes.metric

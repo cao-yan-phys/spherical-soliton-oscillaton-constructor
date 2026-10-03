@@ -6,27 +6,26 @@ from functools import lru_cache
 
 import numpy as np
 
+import kg_oscillaton
+import proca_oscillaton
 from kg_oscillaton import (
     kappa_from_phi1_center,
     phi1_center_from_sp_mass,
-    solve_profile_sp_seeded,
-    solve_sp_ground_state,
+    solve_kg_sp_ground_state,
 )
 from proca_oscillaton import (
-    solve_profile as solve_vector_profile,
-    solve_profile_scaled_seeded,
-    solve_radial_proca_nr_ground_state,
+    solve_proca_sp_ground_state,
 )
 
 
 @lru_cache(maxsize=16)
-def _cached_sp_ground_state(y_max: float, n_grid: int, tol: float):
-    return solve_sp_ground_state(y_max=y_max, n_grid=n_grid, tol=tol)
+def _cached_kg_sp_ground_state(y_max: float, n_grid: int, tol: float):
+    return solve_kg_sp_ground_state(y_max=y_max, n_grid=n_grid, tol=tol)
 
 
 @lru_cache(maxsize=8)
-def _cached_radial_proca_nr_ground_state(y_max: float, n_grid: int, tol: float):
-    return solve_radial_proca_nr_ground_state(y_max=y_max, n_grid=n_grid, tol=tol)
+def _cached_proca_sp_ground_state(y_max: float, n_grid: int, tol: float):
+    return solve_proca_sp_ground_state(y_max=y_max, n_grid=n_grid, tol=tol)
 
 
 def epsilon_from_omega(omega: float) -> float:
@@ -91,7 +90,7 @@ def boundary_diagnostics(profile, *, n_time: int = 96) -> dict[str, float]:
         from proca_oscillaton.diagnostics import boundary_residuals
 
         return boundary_residuals(profile, n_time=n_time)
-    raise TypeError("profile must be a scalar or radial-Proca oscillaton profile")
+    raise TypeError("profile must be a KG or Proca oscillaton profile")
 
 
 def profile_diagnostics(profile, *, n_time: int = 96) -> dict[str, float | bool | str]:
@@ -134,7 +133,7 @@ def metric_mode(profile, family: str, mode: int, x: np.ndarray) -> np.ndarray:
     return np.interp(x, profile.x, coeffs[int(matches[0])])
 
 
-def construct_scalar_oscillaton(
+def construct_kg_oscillaton(
     target_mass: float,
     *,
     jmax: int = 6,
@@ -152,7 +151,7 @@ def construct_scalar_oscillaton(
 
     def solve(phi1_center: float):
         kappa = kappa_from_phi1_center(phi1_center)
-        return solve_profile_sp_seeded(
+        return kg_oscillaton.solve_profile_seeded(
             phi1_center,
             jmax=jmax,
             x_max=max(80.0, 45.0 / kappa),
@@ -203,12 +202,12 @@ def construct_scalar_oscillaton(
     return best
 
 
-def _construct_vector_reference_uncached():
+def _construct_proca_reference_uncached():
 
     values = [0.02, 0.012, 0.006, 0.003, 0.0015, 0.001, 0.0007, 0.0005, 0.00035, 0.000334]
     previous = None
     for value in values:
-        previous = solve_vector_profile(
+        previous = proca_oscillaton.solve_profile(
             value,
             jmax=2,
             x_max=360.0,
@@ -222,18 +221,18 @@ def _construct_vector_reference_uncached():
 
 
 @lru_cache(maxsize=1)
-def _cached_vector_reference():
-    return _construct_vector_reference_uncached()
+def _cached_proca_reference():
+    return _construct_proca_reference_uncached()
 
 
-def construct_vector_reference(*, cache: bool = True):
+def construct_proca_reference(*, cache: bool = True):
 
     if cache:
-        return copy.deepcopy(_cached_vector_reference())
-    return _construct_vector_reference_uncached()
+        return copy.deepcopy(_cached_proca_reference())
+    return _construct_proca_reference_uncached()
 
 
-def construct_vector_oscillaton(
+def construct_proca_oscillaton(
     target_mass: float,
     *,
     jmax: int = 6,
@@ -250,9 +249,9 @@ def construct_vector_oscillaton(
     if jmax < 2 or jmax % 2:
         raise ValueError("jmax must be an even integer >= 2")
 
-    profile = construct_vector_reference() if reference is None else reference
+    profile = construct_proca_reference() if reference is None else reference
     u1_center = profile.u1_center * (target_mass / profile.mass) ** 3
-    profile = solve_profile_scaled_seeded(
+    profile = proca_oscillaton.solve_profile_seeded(
         u1_center,
         profile,
         jmax=2,
@@ -263,7 +262,7 @@ def construct_vector_oscillaton(
     )
     for _ in range(3):
         u1_center *= (target_mass / profile.mass) ** 3
-        profile = solve_profile_scaled_seeded(
+        profile = proca_oscillaton.solve_profile_seeded(
             u1_center,
             profile,
             jmax=2,
@@ -273,7 +272,7 @@ def construct_vector_oscillaton(
             require_success=require_success,
         )
     if jmax > 2:
-        profile = solve_profile_scaled_seeded(
+        profile = proca_oscillaton.solve_profile_seeded(
             u1_center,
             profile,
             jmax=jmax,
@@ -287,7 +286,7 @@ def construct_vector_oscillaton(
         if abs(profile.mass - target_mass) / target_mass < mass_tol:
             break
         u1_center *= (target_mass / profile.mass) ** 3
-        profile = solve_profile_scaled_seeded(
+        profile = proca_oscillaton.solve_profile_seeded(
             u1_center,
             profile,
             jmax=jmax,
@@ -299,15 +298,15 @@ def construct_vector_oscillaton(
     return profile
 
 
-def scalar_sp_metric_arrays(x: np.ndarray, target_mass: float):
+def kg_sp_metric_arrays(x: np.ndarray, target_mass: float):
 
     if target_mass <= 0.0:
         raise ValueError("target_mass must be positive")
     x = np.asarray(x, dtype=float)
-    sp_base = _cached_sp_ground_state(45.0, 1200, 1.0e-7)
+    sp_base = _cached_kg_sp_ground_state(45.0, 1200, 1.0e-7)
     kappa_sp = target_mass / sp_base.dimensionless_cloud_mass
     z = kappa_sp * x
-    sp = _cached_sp_ground_state(max(45.0, float(z[-1])), 1200, 1.0e-7)
+    sp = _cached_kg_sp_ground_state(max(45.0, float(z[-1])), 1200, 1.0e-7)
     V = kappa_sp**2 * np.interp(z, sp.y, sp.V)
     dV_dx = kappa_sp**3 * np.interp(z, sp.y, sp.dV)
     V_inf = kappa_sp**2 * sp.V_infinity
@@ -319,11 +318,11 @@ def scalar_sp_metric_arrays(x: np.ndarray, target_mass: float):
     return arrays, copy.deepcopy(sp.scaled(kappa_sp))
 
 
-def radial_proca_sp_metric_arrays(x: np.ndarray, target_mass: float):
+def proca_sp_metric_arrays(x: np.ndarray, target_mass: float):
 
     if target_mass <= 0.0:
         raise ValueError("target_mass must be positive")
-    profile = _cached_radial_proca_nr_ground_state(50.0, 900, 1.0e-7)
+    profile = _cached_proca_sp_ground_state(50.0, 900, 1.0e-7)
     scale = target_mass / profile.dimensionless_cloud_mass
     scaled = copy.deepcopy(profile.scaled(scale))
     return scaled.as_metric_arrays(np.asarray(x, dtype=float)), scaled

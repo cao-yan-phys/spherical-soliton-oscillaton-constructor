@@ -1,9 +1,9 @@
 # Spherical Soliton & Oscillaton Constructor
 
-Numerical constructors for spherically symmetric (Newtonian) solitons and (relativistic) oscillatons of real scalar and real Proca fields in Einstein gravity.
+Numerical constructors for spherically symmetric (Newtonian) solitons and (relativistic) oscillatons of real scalar (Klein-Gordon) and real vector (Proca) fields in Einstein gravity.
 
 <p align="center">
-  <img src="figures/proca_g00_m6e-1.gif" alt="Time-dependent Proca oscillaton metric profile" width="420" style="border-radius:50%;">
+  <img src="figures/proca_g00_m6e-1.gif" width="420" style="border-radius:50%;">
 </p>
 <p align="center"><i>g</i><sub>00</sub>(t,x) of a spherical Proca oscillaton; parameters: <code>mu*M_ADM=0.600014874, omega=0.978575355, epsilon=0.205888987, jmax=6</code></p>
 
@@ -23,17 +23,17 @@ Relativistic profiles are constructed in polar-areal coordinates. The input `tar
 
 ```python
 from oscillaton_builders import (
-    construct_scalar_oscillaton,
-    construct_vector_oscillaton,
+    construct_kg_oscillaton,
+    construct_proca_oscillaton,
 )
 
-scalar = construct_scalar_oscillaton(target_mass=0.2)
-proca = construct_vector_oscillaton(target_mass=0.2)
+kg = construct_kg_oscillaton(target_mass=0.2)
+proca = construct_proca_oscillaton(target_mass=0.2)
 
-print(scalar.mass, scalar.omega)
+print(kg.mass, kg.omega)
 print(proca.mass, proca.omega)
 
-scalar_initial_data = scalar.initial_data()
+kg_initial_data = kg.initial_data()
 proca_initial_data = proca.initial_data()
 ```
 
@@ -42,37 +42,40 @@ The returned profile objects provide `x`, `omega`, `mass`, `A0`, `C0`, `mass_pro
 ### Nonrelativistic References
 
 ```python
-from kg_oscillaton import solve_sp_ground_state
-from proca_oscillaton import solve_radial_proca_nr_ground_state
+from kg_oscillaton import solve_kg_sp_ground_state
+from proca_oscillaton import solve_proca_sp_ground_state
 
-scalar_sp = solve_sp_ground_state()
-proca_sp = solve_radial_proca_nr_ground_state()
+kg_sp = solve_kg_sp_ground_state()
+proca_sp = solve_proca_sp_ground_state()
 ```
 
-### Scalar Outgoing Radiation
+### KG Outgoing Radiation
 
 ```python
-from kg_oscillaton import solve_scalar_outgoing_radiation
+from kg_oscillaton import solve_kg_outgoing_radiation
 
-radiation = solve_scalar_outgoing_radiation()
+radiation = solve_kg_outgoing_radiation()
 print(radiation.omega, radiation.mass, radiation.c3_outgoing)
 print(radiation.mass_loss_rate)
 ```
 
 ## Examples
 
-<p align="center"><img src="figures/scalar_proca_radial_nr_same_mass_m2e-3.png" alt="Scalar and Proca profiles at matched mass" width="900"></p>
+<p align="center"><img src="figures/kg_proca_radial_nr_same_mass_m2e-3.png" width="900"></p>
 
-<p align="center"><img src="figures/scalar_proca_radial_nr_same_mass_m2e-1.png" alt="Scalar and Proca profiles at matched mass" width="900"></p>
 
-<p align="center"><img src="figures/scalar_proca_radial_nr_same_mass_m6e-1.png" alt="Scalar and Proca profiles at matched mass" width="900"></p>
+<p align="center"><img src="figures/kg_proca_radial_nr_same_mass_m2e-1.png" width="900"></p>
 
-<p align="center"><img src="figures/scalar_poisson_potentials_vs_local_m1e-1.png" alt="Scalar metric potentials and local estimate" width="900"></p>
+
+<p align="center"><img src="figures/kg_proca_radial_nr_same_mass_m6e-1.png" width="900"></p>
+
+
+<p align="center"><img src="figures/kg_poisson_potentials_vs_local_m1e-1.png" width="900"></p>
 
 ### Radiation Loss
 
-Harmonic modes satisfying $j\omega_{\mathrm{phys}}>\mu$ propagate in the wave zone. For the configurations below, the leading outgoing-radiation channel is $j=3$, and its energy flux determines the mass-loss rate. The scalar outgoing-radiation amplitude is compared with [arXiv:1107.2791](https://arxiv.org/abs/1107.2791), while the Proca result is checked against the corresponding minimum-amplitude standing-wave construction.
+Harmonic modes satisfying $n\omega_{\mathrm{phys}}>\mu$ propagate in the wave zone. For the configurations below, the leading outgoing-radiation channel is $n=3$, and its energy flux determines the mass-loss rate. The KG outgoing-radiation amplitude is compared with [arXiv:1107.2791](https://arxiv.org/abs/1107.2791), while the Proca result is checked against the corresponding minimum-amplitude standing-wave construction.
 
-<p align="center"><img src="figures/scalar_outgoing_radiation_benchmark_omega086.png" alt="Scalar outgoing-radiation benchmark" width="900"></p>
+<p align="center"><img src="figures/kg_outgoing_radiation_benchmark_omega086.png" width="500"></p>
 
-<p align="center"><img src="figures/proca_outgoing_radiation_m1.png" alt="Proca outgoing radiation" width="900"></p>
+<p align="center"><img src="figures/proca_outgoing_radiation_m1.png" width="500"></p>

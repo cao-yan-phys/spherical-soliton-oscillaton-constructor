@@ -19,12 +19,12 @@ from .fourier_projection import (
 @dataclass(frozen=True)
 class _RadiationModes:
 
-    scalar: np.ndarray
+    kg: np.ndarray
     metric: np.ndarray
 
     @property
-    def n_scalar(self) -> int:
-        return int(self.scalar.size)
+    def n_kg(self) -> int:
+        return int(self.kg.size)
 
     @property
     def n_metric(self) -> int:
@@ -33,7 +33,7 @@ _RadiationModes.__doc__ = None
 
 
 @dataclass(frozen=True)
-class ScalarOutgoingRadiationResult:
+class KGOutgoingRadiationResult:
 
 
     omega: float
@@ -41,7 +41,7 @@ class ScalarOutgoingRadiationResult:
     mass: float
     phi1_center: float
     delta3: float
-    scalar_jmax: int
+    kg_jmax: int
     r_max: float
     c3_standing: float
     c3_outgoing: float
@@ -55,17 +55,17 @@ class ScalarOutgoingRadiationResult:
     r: np.ndarray
     phi3_standing: np.ndarray
     phi3_outgoing: np.ndarray
-ScalarOutgoingRadiationResult.__doc__ = None
+KGOutgoingRadiationResult.__doc__ = None
 
 
 def _radiation_modes(jmax: int) -> _RadiationModes:
     modes = mode_set(jmax)
-    return _RadiationModes(scalar=modes.scalar, metric=modes.metric)
+    return _RadiationModes(kg=modes.kg, metric=modes.metric)
 
 
 def _split_state(y: np.ndarray, jmax: int):
     modes = _radiation_modes(jmax)
-    ns = modes.n_scalar
+    ns = modes.n_kg
     nm = modes.n_metric
     phi = y[:ns]
     dphi = y[ns : 2 * ns]
@@ -77,7 +77,7 @@ def _split_state(y: np.ndarray, jmax: int):
 
 def _state_size(jmax: int) -> int:
     modes = _radiation_modes(jmax)
-    return 2 * modes.n_scalar + 3 * modes.n_metric
+    return 2 * modes.n_kg + 3 * modes.n_metric
 
 
 def _time_grid(n_time: int) -> np.ndarray:
@@ -130,15 +130,15 @@ def _isotropic_rhs(
     theta = _time_grid(n_time)
     phi, dphi, a_modes, b_modes, db_modes = _split_state(y, jmax)
 
-    scalar_basis = evaluate_fourier_modes(modes.scalar, theta)
+    kg_basis = evaluate_fourier_modes(modes.kg, theta)
     metric_basis = evaluate_fourier_modes(modes.metric, theta)
-    field = phi.T @ scalar_basis
-    field_r = dphi.T @ scalar_basis
+    field = phi.T @ kg_basis
+    field_r = dphi.T @ kg_basis
     field_t = phi.T @ evaluate_fourier_modes(
-        modes.scalar, theta, omega=omega, time_derivative=1
+        modes.kg, theta, omega=omega, time_derivative=1
     )
     field_tt = phi.T @ evaluate_fourier_modes(
-        modes.scalar, theta, omega=omega, time_derivative=2
+        modes.kg, theta, omega=omega, time_derivative=2
     )
 
     metric_a = 1.0 + a_modes.T @ metric_basis
@@ -199,11 +199,11 @@ def _isotropic_rhs(
 
     projector = _project_cos_complex if np.iscomplexobj(y) else project_cos_coefficients
     derivative = np.zeros_like(y)
-    ns = modes.n_scalar
+    ns = modes.n_kg
     nm = modes.n_metric
     derivative[:ns] = dphi
     derivative[ns : 2 * ns] = projector(
-        field_rr, theta, modes.scalar
+        field_rr, theta, modes.kg
     )
     derivative[2 * ns : 2 * ns + nm] = projector(
         metric_a_r, theta, modes.metric
@@ -263,7 +263,7 @@ def _polar_seed(
     tol: float,
 ) -> tuple[np.ndarray, float]:
     modes = _radiation_modes(jmax)
-    ns = modes.n_scalar
+    ns = modes.n_kg
     nm = modes.n_metric
     y = np.zeros((_state_size(jmax), r.size))
     seed_jmax = jmax + 1 if jmax % 2 else jmax
@@ -300,8 +300,8 @@ def _polar_seed(
     origin = np.isnan(x_at_r)
     x_at_r[origin] = origin_scale * r[origin]
 
-    for index, mode in enumerate(modes.scalar):
-        matches = np.where(seed.scalar_modes == mode)[0]
+    for index, mode in enumerate(modes.kg):
+        matches = np.where(seed.kg_modes == mode)[0]
         if not matches.size:
             continue
         seed_index = int(matches[0])
@@ -368,7 +368,7 @@ def _extend_solution(
         return guess
 
     modes = _radiation_modes(jmax)
-    ns = modes.n_scalar
+    ns = modes.n_kg
     nm = modes.n_metric
     radius = r[mask]
     a0 = 2 * ns
@@ -393,7 +393,7 @@ def _standing_boundary_conditions(
     n_time: int,
 ):
     modes = _radiation_modes(jmax)
-    ns = modes.n_scalar
+    ns = modes.n_kg
     nm = modes.n_metric
 
     def boundary(ya: np.ndarray, yb: np.ndarray, parameter: np.ndarray):
@@ -411,29 +411,29 @@ def _standing_boundary_conditions(
         )[:, 0]
         da_outer = rhs_outer[2 * ns : 2 * ns + nm]
         mass = 0.5 * r_outer * b_outer[0]
-        scalar_outer = []
-        for index, mode in enumerate(modes.scalar):
+        kg_outer = []
+        for index, mode in enumerate(modes.kg):
             value = float(yb[index])
             derivative = float(yb[ns + index])
             if mode == 1:
                 epsilon = math.sqrt(max(0.0, 1.0 - omega**2))
-                scalar_outer.append(
+                kg_outer.append(
                     derivative + (epsilon + 1.0 / r_outer) * value
                 )
             elif mode == 3:
                 basis, basis_derivative = _matching_basis(
                     r_outer, omega, delta3, mass
                 )
-                scalar_outer.append(
+                kg_outer.append(
                     value * basis_derivative - derivative * basis
                 )
             else:
-                scalar_outer.append(value)
+                kg_outer.append(value)
         return np.r_[
             ya[0] - phi1_center,
             ya[ns : 2 * ns],
             ya[2 * ns + 2 * nm : 2 * ns + 3 * nm],
-            np.asarray(scalar_outer),
+            np.asarray(kg_outer),
             a_outer[0] + r_outer * da_outer[0],
             a_outer[1:],
             b_outer[0] + r_outer * db_outer[0],
@@ -495,7 +495,7 @@ def _solve_standing_wave(
     if not solution.success:
         residual = float(np.max(solution.rms_residuals))
         raise RuntimeError(
-            "scalar standing-wave solve failed: "
+            "KG standing-wave solve failed: "
             f"status={solution.status}, max_rms_residual={residual:.3e}, "
             f"message={solution.message}"
         )
@@ -504,13 +504,13 @@ def _solve_standing_wave(
 
 def _standing_summary(solution, jmax: int) -> dict[str, float]:
     modes = _radiation_modes(jmax)
-    ns = modes.n_scalar
+    ns = modes.n_kg
     omega = float(solution.p[0])
     r_outer = float(solution.x[-1])
     _, _, a_modes, b_modes, _ = _split_state(solution.y, jmax)
     mass_a = -0.5 * r_outer * a_modes[0, -1]
     mass_b = 0.5 * r_outer * b_modes[0, -1]
-    i3 = int(np.where(modes.scalar == 3)[0][0])
+    i3 = int(np.where(modes.kg == 3)[0][0])
     c3 = _standing_wave_amplitude(
         float(solution.y[i3, -1]),
         float(solution.y[ns + i3, -1]),
@@ -541,9 +541,9 @@ class _ComplexBackground:
     @classmethod
     def from_solution(cls, solution, jmax: int) -> "_ComplexBackground":
         modes = _radiation_modes(jmax)
-        i3 = int(np.where(modes.scalar == 3)[0][0])
-        i5 = int(np.where(modes.scalar == 5)[0][0])
-        ns = modes.n_scalar
+        i3 = int(np.where(modes.kg == 3)[0][0])
+        i5 = int(np.where(modes.kg == 5)[0][0])
+        ns = modes.n_kg
         nm = modes.n_metric
         selected = [i3, ns + i3, i5, ns + i5]
         for metric_index in range(1, nm):
@@ -684,7 +684,7 @@ def _solve_outgoing_response(
     if not solution.success:
         residual = float(np.max(solution.rms_residuals))
         raise RuntimeError(
-            "scalar outgoing-radiation response solve failed: "
+            "KG outgoing-radiation response solve failed: "
             f"status={solution.status}, max_rms_residual={residual:.3e}, "
             f"message={solution.message}"
         )
@@ -692,7 +692,7 @@ def _solve_outgoing_response(
 
 
 def _validated_radii(r_max: float | Iterable[float]) -> np.ndarray:
-    if np.isscalar(r_max):
+    if np.ndim(r_max) == 0:
         radii = np.array([float(r_max)])
     else:
         radii = np.asarray(tuple(r_max), dtype=float)
@@ -705,31 +705,31 @@ def _validated_radii(r_max: float | Iterable[float]) -> np.ndarray:
     return radii
 
 
-def solve_scalar_outgoing_radiation(
+def solve_kg_outgoing_radiation(
     phi1_center: float = 0.53137,
     delta3: float = -0.8,
     *,
-    scalar_jmax: int = 5,
+    kg_jmax: int = 5,
     r_max: float | Iterable[float] = (60.0, 80.0),
     n_grid: int = 520,
     n_time: int = 96,
     tol: float = 5.0e-5,
     response_tol: float = 1.0e-7,
     use_mass_phase: bool = True,
-) -> ScalarOutgoingRadiationResult:
+) -> KGOutgoingRadiationResult:
 
     if not np.isfinite(phi1_center) or phi1_center <= 0.0:
         raise ValueError("phi1_center must be finite and positive")
     if (
-        not isinstance(scalar_jmax, (int, np.integer))
-        or scalar_jmax < 5
-        or scalar_jmax % 2 == 0
+        not isinstance(kg_jmax, (int, np.integer))
+        or kg_jmax < 5
+        or kg_jmax % 2 == 0
     ):
-        raise ValueError("scalar_jmax must be an odd integer at least 5")
+        raise ValueError("kg_jmax must be an odd integer at least 5")
     if n_grid < 100:
         raise ValueError("n_grid must be at least 100")
-    if n_time < 2 * scalar_jmax + 2:
-        raise ValueError("n_time must be at least 2*scalar_jmax+2")
+    if n_time < 2 * kg_jmax + 2:
+        raise ValueError("n_time must be at least 2*kg_jmax+2")
     if tol <= 0.0 or response_tol <= 0.0:
         raise ValueError("tol and response_tol must be positive")
     radii = _validated_radii(r_max)
@@ -743,14 +743,14 @@ def solve_scalar_outgoing_radiation(
         standing_solution = _solve_standing_wave(
             phi1_center,
             delta3,
-            jmax=scalar_jmax,
+            jmax=kg_jmax,
             r_max=float(radius),
             n_grid=n_grid,
             n_time=n_time,
             tol=tol,
             previous=previous,
         )
-        summary = _standing_summary(standing_solution, scalar_jmax)
+        summary = _standing_summary(standing_solution, kg_jmax)
         omega_history.append(summary["omega"])
         mass_history.append(summary["mass"])
         c3_history.append(summary["c3"])
@@ -761,8 +761,8 @@ def solve_scalar_outgoing_radiation(
         )
 
     assert standing_solution is not None
-    final_summary = _standing_summary(standing_solution, scalar_jmax)
-    background = _ComplexBackground.from_solution(standing_solution, scalar_jmax)
+    final_summary = _standing_summary(standing_solution, kg_jmax)
+    background = _ComplexBackground.from_solution(standing_solution, kg_jmax)
     response_solution = _solve_outgoing_response(
         background,
         n_time=n_time,
@@ -786,13 +786,13 @@ def solve_scalar_outgoing_radiation(
     mass_loss_rate = (
         -0.75 * c3_outgoing**2 * background.omega * wave_number
     )
-    return ScalarOutgoingRadiationResult(
+    return KGOutgoingRadiationResult(
         omega=background.omega,
         epsilon=math.sqrt(max(0.0, 1.0 - background.omega**2)),
         mass=final_summary["mass"],
         phi1_center=float(phi1_center),
         delta3=float(delta3),
-        scalar_jmax=int(scalar_jmax),
+        kg_jmax=int(kg_jmax),
         r_max=float(r[-1]),
         c3_standing=final_summary["c3"],
         c3_outgoing=c3_outgoing,
@@ -811,4 +811,4 @@ def solve_scalar_outgoing_radiation(
     )
 
 
-__all__ = ["ScalarOutgoingRadiationResult", "solve_scalar_outgoing_radiation"]
+__all__ = ["KGOutgoingRadiationResult", "solve_kg_outgoing_radiation"]

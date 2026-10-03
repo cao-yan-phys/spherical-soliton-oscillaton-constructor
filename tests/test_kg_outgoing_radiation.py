@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pytest
 
-from kg_oscillaton import solve_scalar_outgoing_radiation
+from kg_oscillaton import solve_kg_outgoing_radiation
 from kg_oscillaton.outgoing_radiation import (
     _matching_basis,
     _outgoing_amplitude,
@@ -64,9 +64,9 @@ def test_radii_validation():
         _validated_radii([80.0, 60.0])
 
 
-def test_public_solver_rejects_even_scalar_truncation():
-    with pytest.raises(ValueError, match="scalar_jmax"):
-        solve_scalar_outgoing_radiation(scalar_jmax=6)
+def test_public_solver_rejects_even_kg_truncation():
+    with pytest.raises(ValueError, match="kg_jmax"):
+        solve_kg_outgoing_radiation(kg_jmax=6)
 
 
 @pytest.mark.skipif(
@@ -94,7 +94,7 @@ def test_public_solver_rejects_even_scalar_truncation():
         ),
     ],
 )
-def test_scalar_outgoing_radiation_literature_benchmark(
+def test_kg_outgoing_radiation_literature_benchmark(
     phi1_center,
     delta3,
     literature_omega,
@@ -102,7 +102,7 @@ def test_scalar_outgoing_radiation_literature_benchmark(
     literature_c3,
     options,
 ):
-    result = solve_scalar_outgoing_radiation(
+    result = solve_kg_outgoing_radiation(
         phi1_center=phi1_center,
         delta3=delta3,
         **options,

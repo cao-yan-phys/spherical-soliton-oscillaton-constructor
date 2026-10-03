@@ -8,7 +8,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from kg_oscillaton import solve_scalar_outgoing_radiation
+from kg_oscillaton import solve_kg_outgoing_radiation
 
 
 def main() -> None:
@@ -16,11 +16,11 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("figures/scalar_outgoing_radiation_benchmark_omega086.png"),
+        default=Path("figures/kg_outgoing_radiation_benchmark_omega086.png"),
     )
     args = parser.parse_args()
 
-    result = solve_scalar_outgoing_radiation()
+    result = solve_kg_outgoing_radiation()
     args.output.parent.mkdir(parents=True, exist_ok=True)
 
     outer = result.r >= result.r_max - 18.0
@@ -74,7 +74,7 @@ def main() -> None:
         spine.set_visible(True)
         spine.set_linewidth(0.9)
     axis.set_title(
-        rf"Scalar oscillaton outgoing radiation: $\omega={result.omega:.7f}$, "
+        rf"KG oscillaton outgoing radiation: $\omega={result.omega:.7f}$, "
         rf"$\mu M_{{\mathrm{{ADM}}}}={result.mass:.7f}$",
         fontsize=13,
     )
