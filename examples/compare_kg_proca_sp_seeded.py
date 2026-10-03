@@ -336,7 +336,7 @@ def main() -> None:
             color=colors["nr"],
             lw=2.0,
             ls="-.",
-            label=r"$\mathrm{Proca\ radial\ SP}$",
+            label=r"$\mathrm{Proca\ SP}$",
         )
         ax.plot(
             rho,

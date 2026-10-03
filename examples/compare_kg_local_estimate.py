@@ -352,7 +352,7 @@ def main() -> None:
         lw=2.0,
         color="k",
         ls="--",
-        label="scalar SP",
+        label="KG SP",
     )
     axes[2].set_yscale("log")
     axes[2].set_xlabel(r"$\tilde{\rho}=\epsilon R$")
@@ -360,7 +360,7 @@ def main() -> None:
     axes[2].legend(fontsize=10)
 
     fig.suptitle(
-        "Scalar metric potentials in Poisson-like gauge, "
+        "Metric potentials of a KG oscillaton in Poisson-like gauge, "
         + rf"$\mu M_{{\mathrm{{ADM}}}} = {zero_mode_mass(profile):.9g}$"
     )
     fig.tight_layout()

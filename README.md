@@ -15,7 +15,7 @@ cd spherical-soliton-oscillaton-constructor
 python -m pip install -r requirements.txt
 ```
 
-Relativistic profiles are constructed in polar-areal coordinates. The input `target_mass` is the dimensionless mass $\mu M_{\mathrm{ADM}}$ in units $G=c=\hbar=1$, where $\mu$ is the boson mass and $M_{\mathrm{ADM}}$ is the oscillaton mass. The returned `omega` is $\omega_{\mathrm{phys}}/\mu$.
+Relativistic profiles are constructed in polar-areal coordinates. The input `target_mass` is the dimensionless mass $\mu M_{\mathrm{ADM}}$ in units $G=c=\hbar=1$, where $\mu$ is the boson mass and $M_{\mathrm{ADM}}$ is the oscillaton mass. The returned `omega` is $\omega_{\mathrm{phys}}/\mu$, with $\omega_{\mathrm{phys}}$ being the fundamental frequency in the coordinate time.
 
 ## Basic Usage
 
@@ -74,7 +74,7 @@ print(radiation.mass_loss_rate)
 
 ### Radiation Loss
 
-Harmonic modes satisfying $n\omega_{\mathrm{phys}}>\mu$ propagate in the wave zone. For the configurations below, the leading outgoing-radiation channel is $n=3$, and its energy flux determines the mass-loss rate. The KG outgoing-radiation amplitude is compared with [arXiv:1107.2791](https://arxiv.org/abs/1107.2791), while the Proca result is checked against the corresponding minimum-amplitude standing-wave construction.
+Harmonic modes of the matter field satisfying $j\omega_{\mathrm{phys}}>\mu$ ($j$ being the harmonic number) propagate in the wave zone. For the configurations below, the leading outgoing-radiation channel is $j=3$, and its energy flux determines the mass-loss rate. The KG outgoing-radiation amplitude is compared with [arXiv:1107.2791](https://arxiv.org/abs/1107.2791), while the Proca result is checked against the corresponding minimum-amplitude standing-wave construction.
 
 <p align="center"><img src="figures/kg_outgoing_radiation_benchmark_omega086.png" width="500"></p>
 
